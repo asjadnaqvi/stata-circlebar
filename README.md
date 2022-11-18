@@ -1,0 +1,145 @@
+
+![StataMin](https://img.shields.io/badge/stata-2015-blue) ![issues](https://img.shields.io/github/issues/asjadnaqvi/stata-circlebar) ![license](https://img.shields.io/github/license/asjadnaqvi/stata-circlebar) ![Stars](https://img.shields.io/github/stars/asjadnaqvi/stata-circlebar) ![version](https://img.shields.io/github/v/release/asjadnaqvi/stata-circlebar) ![release](https://img.shields.io/github/release-date/asjadnaqvi/stata-circlebar)
+
+# circlebar v1.0 (beta)
+
+This package allows us to draw circular bar graphs in Stata.
+
+
+## Installation
+
+The package can be installed via SSC or GitHub. The GitHub version, *might* be more recent due to bug fixes, feature updates etc, and *may* contain syntax improvements and changes in *default* values. See version numbers below. Eventually the GitHub version is published on SSC.
+
+SSC ():
+
+```
+Coming soon
+```
+
+GitHub (**v1.0**):
+
+```
+net install circlebar, from("https://raw.githubusercontent.com/asjadnaqvi/stata-circlebar/main/installation/") replace
+```
+
+
+The `palettes` package is required to run this command:
+
+```
+ssc install palettes, replace
+ssc install colrspace, replace
+```
+
+Even if you have these packages installed, please check for updates: `ado update, update`.
+
+If you want to make a clean figure, then it is advisable to load a clean scheme. These are several available and I personally use the following:
+
+```
+ssc install schemepack, replace
+set scheme white_tableau  
+```
+
+I also prefer narrow fonts in figures with long labels. You can change this as follows:
+
+```
+graph set window fontface "Arial Narrow"
+```
+
+
+## Syntax
+
+The syntax for **v1.0** is as follows:
+
+```
+circlebar numvar [if] [in], by(var1) [ stack(var2) ]
+                [ radmin(num) radmax(num) circles(num) gap(num) alpha(num) palette(str)
+                  nolabels rotatelabel showvalues nocircles nolegend
+                  lcolor(str) lwidth(str) circcolor(str) circwidth(str) labgap(num) labsize(str)
+                  title(str) subtitle(str) note(str) name(str)                              
+                ]
+
+```
+
+See the help file `help circlebar` for details.
+
+The most basic use is as follows:
+
+```
+circlebar values, by(var1) stack(var2)
+```
+
+where `var1` and `var2` are the string source and destination variables respectively against which the `values` are plotted.
+
+
+
+## Examples
+
+Get the example data from GitHub:
+
+```
+use "https://github.com/asjadnaqvi/stata-circlebar/blob/main/data/cbardata.dta?raw=true", clear
+```
+
+Let's test the `circlebar` command:
+
+```
+circlebar deathspm, by(month) 
+```
+
+<img src="/figures/circlebar1.png" height="600">
+
+
+```
+circlebar deathspm, by(month) radmin(0)
+```
+
+<img src="/figures/circlebar2.png" height="600">
+
+```
+circlebar deathspm, by(month) gap(0.5)
+```
+
+<img src="/figures/circlebar3.png" height="600">
+
+```
+circlebar deathspm, by(month) gap(0.5) alpha(80) circles(6)
+```
+
+<img src="/figures/circlebar4.png" height="600">
+
+```
+circlebar deathspm, by(month) gap(0.5) palette(CET C6)
+```
+
+<img src="/figures/circlebar5.png" height="600">
+
+```
+circlebar deathspm, by(month) gap(2) palette(CET C6) rotatelab
+```
+
+<img src="/figures/circlebar6.png" height="600">
+
+```
+circlebar deathspm, by(month) stack(continent) gap(0.5) radmin(5) palette(CET C6, n(6)) rotatelab
+```
+
+<img src="/figures/circlebar7.png" height="600">
+
+
+
+## Feedback
+
+Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to report errors, feature enhancements, and/or other requests. 
+
+
+## Versions
+
+**v1.0 (18 Nov 2022)**
+- Public release. Currently in beta.
+
+
+
+
+
+
+
