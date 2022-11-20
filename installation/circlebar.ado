@@ -10,16 +10,16 @@
 cap program drop circlebar
 
 
-program circlebar, sortpreserve
+program circlebar, // sortpreserve
 
 version 15
  
 	syntax varlist(min=1 max=1 numeric) [if] [in], by(varname) 													  ///
 		[ stack(varname) radmin(real 4) radmax(real 10) gap(real 0) alpha(real 100)								] ///
-		[ NOLABels ROTATELABel SHOWVALues LColor(string) LWidth(string) palette(string) NOLEGend	    			] ///
-		[ NOCIRCles CIRCles(real 5) CIRCColor(string) CIRCWidth(string) 							 			] ///
+		[ NOLABels ROTATELABel SHOWVALues LColor(string) LWidth(string) palette(string) NOLEGend	    		] ///
+		[ NOCIRCles CIRCles(real 5) RAnge(numlist min=1 max=1) CIRCColor(string) CIRCWidth(string) CIRCTop		] ///
 		[ LABGap(real 5) LABSize(string) 					]			///
-		[ title(passthru) subtitle(passthru) note(passthru)	]			 ///
+		[ title(passthru) subtitle(passthru) note(passthru)	]			///
 		[ scheme(passthru) name(passthru) text(passthru) 	] 
 		
 		
@@ -32,17 +32,15 @@ version 15
 	
 	
 	if `radmin' >= `radmax' {
-		di as error  "{bf:radmin} >= {bf:radmax}. Please define correct bounds."	
+		di as error  "{bf:radmin} >= {bf:radmax}. {it:radmin} > {it:radmax}."	
 		exit 
 	}
 
 
 	cap findfile carryforward.ado
 	if _rc != 0 {
-		qui ssc install carryforward, replace // sneaky install ;)
+		qui ssc install carryforward, replace -
 	}	
-	
-	
 	
 	marksample touse, strok
 	
@@ -111,7 +109,6 @@ preserve
 		local idlab_`x' : label `by' `x'  
 	}	
 	
-	
 
 	collapse (sum) `varlist', by(`by' `stack')
 	
@@ -119,21 +116,55 @@ preserve
 				
 	by `by': gen double stackvar = sum(`varlist')				
 				
+	
 	summ stackvar, meanonly
 	local maxval = r(max) // the maximum value of the height
+	*noi di "maximum stackvar value = `maxval'"
 				
 	levelsof `by'
 	scalar obs = `r(r)'
 
 	levelsof `stack'
-	scalar lvls = `r(r)'				
-
-	gen double height = sqrt(stackvar * obs / _pi)  
-
-	summ height, meanonly
-	gen double radius = (height / r(max))   
-	drop height	
+	scalar lvls = `r(r)'	
 	
+	di obs
+
+
+	*gen double height = stackvar // * obs  // / _pi // sqrt()  
+
+	
+
+	if "`range'" != "" {
+		*tokenize `range'
+		*local rlo `1'
+		local rhi `range'		
+		
+		summ stackvar, meanonly
+		
+		if `r(max)' > `rhi' {
+			noi di as err "The {bf:range} upper bound of `rhi' is lower than the maximum value `r(max)' in the data."
+			exit
+		}
+		
+		
+	}	
+	else {
+		summ stackvar, meanonly
+		local rhi = r(max)
+	}
+	
+		
+
+	
+	*noi di "height = `r(max)'"
+	
+
+	
+	gen double radius = (stackvar / `rhi')   
+	
+
+	
+	*drop height
 	
 	*** rescale radius to (a,b) = ((b - a)(x - xmin)/(xmax - xmin)) + a	
 	replace radius = ((`radmax' - `radmin') * (radius - 0) / (1 - 0)) + `radmin'
@@ -148,9 +179,10 @@ preserve
 	gen double x =  radius * cos(angle) 
 	gen double y =  radius * sin(angle) 		
 	
+
+	
 	local items = _N
 	
-
 	sum `by', meanonly
 	local maxval = r(max) + 1
 	
@@ -391,7 +423,7 @@ preserve
 	sort `stack' arc marker0 sortme	
 	drop marker0				
 					
-	by `stack' arc: gen id = _n  // dont use bysort here
+	by `stack' arc: gen id = _n  
 						
 	reshape wide x y sortme angle radius serial, i(id `stack') j(arc)				
 		
@@ -474,6 +506,7 @@ preserve
 	
 	// local sides = cond("`polygon'" == "",  300, `items')   // deal with later
 	
+	
 	local gap = (`radmax' - `radmin') / (`circles' - 1)
 	
 		
@@ -491,6 +524,12 @@ preserve
 	}
 	
 
+	if "`circtop'" != "" {
+		local rings2 `rings'
+		local rings
+	}
+	
+	
 	
 	/////////////////
 	//   legend    //
@@ -572,10 +611,12 @@ preserve
 	}
 		
 		
+		
     twoway	///
 		`rings'	///
 		`areagraph' ///
 		`labs'		///
+		`rings2'	///
 			(function   sqrt(`radmin'^2 - (x)^2), recast(area) fc(white) fi(100) lw(0.2) lc(white) range(-`radmin' `radmin'))   ///
 			(function  -sqrt(`radmin'^2 - (x)^2), recast(area) fc(white) fi(100) lw(0.2) lc(white) range(-`radmin' `radmin'))   ///
 					, ///
@@ -584,7 +625,11 @@ preserve
 						xlabel(-`radmax' `radmax', nogrid) ///
 						ylabel(-`radmax' `radmax', nogrid) ///		
 						`legend' `title' `note' `subtitle' `text' `scheme' `name'
+						
+						
 		
+	
+	
 	
 restore			
 }

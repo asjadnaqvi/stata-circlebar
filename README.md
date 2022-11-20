@@ -52,8 +52,8 @@ The syntax for **v1.0** is as follows:
 
 ```
 circlebar numvar [if] [in], by(var1) [ stack(var2) ]
-                [ radmin(num) radmax(num) circles(num) gap(num) alpha(num) palette(str)
-                  nolabels rotatelabel showvalues nocircles nolegend
+                [ radmin(num) radmax(num) circles(num) gap(num) alpha(num) palette(str) range(num) 
+                  nolabels rotatelabel showvalues nocircles nolegend circtop
                   lcolor(str) lwidth(str) circcolor(str) circwidth(str) labgap(num) labsize(str)
                   title(str) subtitle(str) note(str) name(str)                              
                 ]
@@ -108,6 +108,18 @@ circlebar deathspm, by(month) gap(0.5) alpha(80) circles(6)
 <img src="/figures/circlebar4.png" height="600">
 
 ```
+circlebar deathspm, by(month) gap(0.5) circles(6) circtop
+```
+
+<img src="/figures/circlebar4_1.png" height="600">
+
+```
+circlebar deathspm, by(month) gap(0.5) circles(10) ra(18000)
+```
+
+<img src="/figures/circlebar4_2.png" height="600">
+
+```
 circlebar deathspm, by(month) gap(0.5) palette(CET C6)
 ```
 
@@ -120,11 +132,19 @@ circlebar deathspm, by(month) gap(2) palette(CET C6) rotatelab
 <img src="/figures/circlebar6.png" height="600">
 
 ```
-circlebar deathspm, by(month) stack(continent) gap(0.5) radmin(5) palette(CET C6, n(6)) rotatelab
+circlebar deathspm, by(month) stack(continent) gap(1.5) radmin(5) palette(CET C6, n(6)) rotatelab lc(black) circc(gs13) ra(20000) ///
+text(0 0 "Global COVID-19" "{bf:deaths per million}" "in 2021" "(by continent)",  size(2.5)) note("Source: Our World in Data", size(2))
 ```
 
 <img src="/figures/circlebar7.png" height="600">
 
+```
+circlebar deathspm, by(month) stack(continent) palette(tab Color Blind, n(6)) gap(0.5) radmin(4) radmax(10) ra(17000) ///
+text(0 0 "Global COVID-19" "{bf:deaths per million}" "in 2021" "(by continent)",  size(2.5)) ///
+note("Source: Our World in Data", size(2)) circ(8) circc(gs13) labgap(8) rotatelab labs(2.4) 
+```
+
+<img src="/figures/circlebar8.png" height="600">
 
 
 ## Feedback

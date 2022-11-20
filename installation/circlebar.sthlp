@@ -14,7 +14,7 @@
 
 {cmd:circlebar} {it:var} {ifin}, {cmd:by}({it:var}) [ {cmd:stack}({it:var}) ]
                 {cmd:[} {cmd:radmin}({it:num}) {cmd:radmax}({it:num}) {cmdab:circ:les}({it:num}) {cmd:gap}({it:num}) {cmd:alpha}({it:num}) {cmd:palette}({it:str})
-                  {cmdab:nolab:els} {cmdab:rotatelab:el} {cmdab:showval:ues} {cmdab:nocirc:les} {cmdab:noleg:end}
+                  {cmdab:nolab:els} {cmdab:rotatelab:el} {cmdab:showval:ues} {cmdab:nocirc:les}  {cmdab:circt:op} {cmdab:noleg:end} {cmdab:ra:nge}({it:num})
                   {cmdab:lc:olor}({it:str}) {cmdab:lw:idth}({it:str}) {cmdab:circc:olor}({it:str}) {cmdab:circw:idth}({it:str}) {cmdab:labg:ap}({it:num}) {cmdab:labs:ize}({it:str})
                   {cmd:title}({it:str}) {cmd:subtitle}({it:str}) {cmd:note}({it:str}) {cmd:name}({it:str}) 				
                 {cmd:]}
@@ -32,11 +32,14 @@ The pie slices can be stacked by the {it:stack(var2)} variable.
 If there is more data than is required, then the program will collapse the data using the mean value of the {it:varnum} by {it:var1} and {it:var2}.
 If you want other ways of summarizing the variables, then it is highly recommended to prepare the data beforehand.{p_end}
 
+{p2coldent : {opt range(num)}}The height of the circles can be controled by defining an upper bound using {opt range()}. This ensures that data can be made comparable across graphs.
+Note that if the {opt range()} value is lower than the maximum height value in the data, the program will throw an error.{p_end}
+
 {p2coldent : {opt radmin(num)} {opt radmax(num)}}The circles are scaled between a minimum and a maximum radius defined by {opt radmin()} and {opt radmax()} respectively. 
 {opt radmin()} can be set to 0 to start from the origin. This combined with the {opt stack()} option will produce Florence Nightingale's Coxcomb or roseplots.
 Default values are {it:radmin(4)} and {it:radmax(10)}.{p_end}
 
-{p2coldent : {opt circ:les(num)}}The number of rings to plot between the minimum and maximum cicles. Default value is {it:5} for five circles.{p_end}
+{p2coldent : {opt circ:les(num)}}The number of rings to plot between the minimum and maximum circles. Default value is {it:5} for five circles.{p_end}
 
 {p2coldent : {opt gap(num)}}A gap can be added between the pie slices.{p_end}
 
@@ -46,7 +49,9 @@ Use this carefully with the {it:stack()} option as it might cause weird color bl
 
 {p2coldent : {opt palette(str)}}Color name is any named scheme defined in the {stata help colorpalette:colorpalette} package. Default is {stata colorpalette tableau:{it:tableau}}.{p_end}
 
-{p2coldent : {opt nocirc:les}}Hide the circles.{p_end}
+{p2coldent : {opt circt:op}}Draw reference circles on top.{p_end}
+
+{p2coldent : {opt nocirc:les}}Hide the reference circles.{p_end}
 
 {p2coldent : {opt nolab:els}}Hide the slice labels.{p_end}
 
