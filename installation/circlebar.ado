@@ -1,4 +1,4 @@
-*! circlebar v1.0 (18 Nov 2022). Beta
+*! circlebar v1.0 (20 Nov 2022). Beta
 *! Asjad Naqvi (asjadnaqvi@gmail.com)
 
 
@@ -18,8 +18,9 @@ version 15
 		[ stack(varname) radmin(real 4) radmax(real 10) gap(real 0) alpha(real 100)								] ///
 		[ NOLABels ROTATELABel SHOWVALues LColor(string) LWidth(string) palette(string) NOLEGend	    		] ///
 		[ NOCIRCles CIRCles(real 5) RAnge(numlist min=1 max=1) CIRCColor(string) CIRCWidth(string) CIRCTop		] ///
-		[ LABGap(real 5) LABSize(string) 					]			///
-		[ title(passthru) subtitle(passthru) note(passthru)	]			///
+		[ NOCIRCLABels CIRCLABFormat(string) CIRCLABSize(string) CIRCLABColor(string)  		]   ///
+		[ LABGap(real 5) LABSize(string) 					]	///
+		[ title(passthru) subtitle(passthru) note(passthru)	]	///
 		[ scheme(passthru) name(passthru) text(passthru) 	] 
 		
 		
@@ -153,19 +154,10 @@ preserve
 		local rhi = r(max)
 	}
 	
-		
-
-	
-	*noi di "height = `r(max)'"
-	
-
 	
 	gen double radius = (stackvar / `rhi')   
 	
 
-	
-	*drop height
-	
 	*** rescale radius to (a,b) = ((b - a)(x - xmin)/(xmax - xmin)) + a	
 	replace radius = ((`radmax' - `radmin') * (radius - 0) / (1 - 0)) + `radmin'
 	
@@ -315,13 +307,13 @@ preserve
 
 	cap drop x`i'_temp
 	cap drop y`i'_temp
-	*cap drop zone`i'_temp 
+
 
 	qui gen x`i'_temp = .
 	qui gen y`i'_temp = .
 
 		
-	// display "positive half top"
+	// "positive half top"
 
 		sum y`i' if y`i' != 0 & `stack'==`k', meanonly
 
@@ -337,7 +329,7 @@ preserve
 
 		}
 
-	// display "negative half bottom"
+	// "negative half bottom"
 		else if r(min) < 0 & r(max) < 0 {		
 			sum x`i' if x`i' != 0  & `stack'==`k', meanonly
 			replace x`i'_temp = runiform(r(min) , r(max))				if `stack'==`k' 
@@ -349,7 +341,7 @@ preserve
 		}
 		
 
-	// display "positive to negative"
+	// "positive to negative"
 		else if r(min) < 0 & r(max) >= 0 {		
 			
 			sum x`i' if x`i' != 0 & y`i' >= 0 & `stack'==`k', meanonly
@@ -392,7 +384,7 @@ preserve
 	bysort `stack': gen id = _n
 	
 	
-	reshape long  x y angle radius, i(id `stack') j(arc)		// here j is a variable name we create		
+	reshape long  x y angle radius, i(id `stack') j(arc)		
 	
 	
 	gen marker0 = 1 if x==0				
@@ -462,7 +454,31 @@ preserve
 			
 		}	
 		
+	///////////////////////
+	//   circle labels   //
+	///////////////////////			
 	
+	local gap = (`radmax' - `radmin') / (`circles' - 1)
+	
+	if "`circlabformat'" == "" local circlabformat %5.0f
+	if "`circlabsize'"   == "" local circlabsize  = 1.6
+	if "`circlabcolor'"  == "" local circlabcolor gs8
+	
+	local gap2 = (`rhi' - 0) / (`circles' - 1)
+	
+	gen xvar = .
+	gen yvar = .
+	gen xlab = ""
+
+	local i = 1
+
+	forval x = `radmin'(`gap')`radmax' {
+		replace xlab = string(0 + ((`i' - 1) * `gap2'), "`circlabformat'")  in `i' 
+		replace xvar =  `x'  in `i'	
+		replace yvar =  0  in `i'	
+	   
+		local i = `i' + 1 
+	}	
 		
 			
 	*****************
@@ -527,6 +543,16 @@ preserve
 	if "`circtop'" != "" {
 		local rings2 `rings'
 		local rings
+	}
+	
+
+	///////////////////////
+	//   circle labels   //
+	///////////////////////
+	
+	if "`nocirclabels'" == "" {
+		local circlabs (scatter yvar xvar, mc(none) mlab(xlab) mlabpos(0) mlabcolor(`circlabcolor') mlabsize(`circlabsize'))  
+		
 	}
 	
 	
@@ -619,6 +645,7 @@ preserve
 		`rings2'	///
 			(function   sqrt(`radmin'^2 - (x)^2), recast(area) fc(white) fi(100) lw(0.2) lc(white) range(-`radmin' `radmin'))   ///
 			(function  -sqrt(`radmin'^2 - (x)^2), recast(area) fc(white) fi(100) lw(0.2) lc(white) range(-`radmin' `radmin'))   ///
+			`circlabs'  ///
 					, ///
 						xsize(1) ysize(1) aspect(1)  /// 
 						xscale(off) yscale(off) ///
@@ -626,11 +653,7 @@ preserve
 						ylabel(-`radmax' `radmax', nogrid) ///		
 						`legend' `title' `note' `subtitle' `text' `scheme' `name'
 						
-						
-		
-	
-	
-	
+
 restore			
 }
 

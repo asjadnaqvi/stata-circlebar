@@ -88,6 +88,12 @@ circlebar deathspm, by(month)
 
 <img src="/figures/circlebar1.png" height="600">
 
+```
+circlebar deathspm, by(month) nocirclab
+```
+
+<img src="/figures/circlebar1_1.png" height="600">
+
 
 ```
 circlebar deathspm, by(month) radmin(0)
@@ -102,7 +108,7 @@ circlebar deathspm, by(month) gap(0.5)
 <img src="/figures/circlebar3.png" height="600">
 
 ```
-circlebar deathspm, by(month) gap(0.5) alpha(80) circles(6)
+circlebar deathspm, by(month) gap(0.5) alpha(80) circles(6) circlabf(%6.0fc)
 ```
 
 <img src="/figures/circlebar4.png" height="600">
@@ -114,13 +120,13 @@ circlebar deathspm, by(month) gap(0.5) circles(6) circtop
 <img src="/figures/circlebar4_1.png" height="600">
 
 ```
-circlebar deathspm, by(month) gap(0.5) circles(10) ra(18000)
+circlebar deathspm, by(month) gap(0.5) circles(4) ra(18000) nocirclab
 ```
 
 <img src="/figures/circlebar4_2.png" height="600">
 
 ```
-circlebar deathspm, by(month) gap(0.5) palette(CET C6)
+circlebar deathspm, by(month) gap(0.5) palette(CET C6) nocirclab
 ```
 
 <img src="/figures/circlebar5.png" height="600">
@@ -139,9 +145,9 @@ text(0 0 "Global COVID-19" "{bf:deaths per million}" "in 2021" "(by continent)",
 <img src="/figures/circlebar7.png" height="600">
 
 ```
-circlebar deathspm, by(month) stack(continent) palette(tab Color Blind, n(6)) gap(0.5) radmin(4) radmax(10) ra(17000) ///
+circlebar deathspm, by(month) stack(continent) palette(tab Color Blind, n(6)) gap(0.5) radmin(4) radmax(10) ra(18000) ///
 text(0 0 "Global COVID-19" "{bf:deaths per million}" "in 2021" "(by continent)",  size(2.5)) ///
-note("Source: Our World in Data", size(2)) circ(8) circc(gs13) labgap(8) rotatelab labs(2.4) 
+note("Source: Our World in Data", size(2)) circ(5) circc(gs13) labgap(8) rotatelab labs(2.4) circlabf(%6.0fc)
 ```
 
 <img src="/figures/circlebar8.png" height="600">
@@ -154,7 +160,7 @@ Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to 
 
 ## Versions
 
-**v1.0 (18 Nov 2022)**
+**v1.0 (20 Nov 2022)**
 - Public release. Currently in beta.
 
 

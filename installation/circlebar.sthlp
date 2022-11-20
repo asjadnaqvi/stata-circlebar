@@ -1,5 +1,5 @@
 {smcl}
-{* 18November2022}{...}
+{* 20November2022}{...}
 {hi:help circlebar}{...}
 {right:{browse "https://github.com/asjadnaqvi/stata-circlebar":circlebar v1.0 (GitHub)}}
 
@@ -15,6 +15,7 @@
 {cmd:circlebar} {it:var} {ifin}, {cmd:by}({it:var}) [ {cmd:stack}({it:var}) ]
                 {cmd:[} {cmd:radmin}({it:num}) {cmd:radmax}({it:num}) {cmdab:circ:les}({it:num}) {cmd:gap}({it:num}) {cmd:alpha}({it:num}) {cmd:palette}({it:str})
                   {cmdab:nolab:els} {cmdab:rotatelab:el} {cmdab:showval:ues} {cmdab:nocirc:les}  {cmdab:circt:op} {cmdab:noleg:end} {cmdab:ra:nge}({it:num})
+                  {cmdab:nocirclab:els} {cmdab:circlabf:ormat}({it:str}) {cmdab:circlabs:ize}({it:str}) {cmdab:circlabc:olor}({it:str})
                   {cmdab:lc:olor}({it:str}) {cmdab:lw:idth}({it:str}) {cmdab:circc:olor}({it:str}) {cmdab:circw:idth}({it:str}) {cmdab:labg:ap}({it:num}) {cmdab:labs:ize}({it:str})
                   {cmd:title}({it:str}) {cmd:subtitle}({it:str}) {cmd:note}({it:str}) {cmd:name}({it:str}) 				
                 {cmd:]}
@@ -61,7 +62,13 @@ Use this carefully with the {it:stack()} option as it might cause weird color bl
 
 {p2coldent : {opt labs:ize(str)}}Size of the slice labels from the slices. Default value is {it:2}.{p_end}
 
-{p2coldent : {opt showval:ues}}Currently not implemented. Coming soon :){p_end}
+{p2coldent : {opt nocirclab:els}}Hide the labels of the reference circles.{p_end}
+
+{p2coldent : {opt circlabf:ormat}}Format the labels of the reference circles. Default is {it:%5.0f}.{p_end}
+
+{p2coldent : {opt circlabs:ize}}Size of the labels of the reference circles. Default is {it:1.8}.{p_end}
+
+{p2coldent : {opt circlabc:olor}}Color of the labels of the reference circles. Default is {it:gs8}.{p_end}
 
 {p2coldent : {opt lc:olor(str)}}Color of the slice outlines. Default value is {it:white}.{p_end}
 
@@ -106,7 +113,7 @@ See {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}.
 {title:Package details}
 
 Version      : {bf:circlebar} v1.0
-This release : 18 Nov 2022
+This release : 20 Nov 2022
 First release: 18 Nov 2021
 Repository   : {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}
 Keywords     : Stata, circle bar graphs
