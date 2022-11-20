@@ -51,9 +51,11 @@ graph set window fontface "Arial Narrow"
 The syntax for **v1.0** is as follows:
 
 ```
-circlebar numvar [if] [in], by(var1) [ stack(var2) ]
-                [ radmin(num) radmax(num) circles(num) gap(num) alpha(num) palette(str) range(num) 
-                  nolabels rotatelabel showvalues nocircles nolegend circtop
+
+circlebar var [if] [in], by(var) [ stack(var) ]
+                [ radmin(num) radmax(num) circles(num) gap(num) alpha(num) palette(str)
+                  nolabels rotatelabel showvalues nocircles  circtop nolegend range(num)
+                  nocirclabels circlabformat(str) circlabsize(str) circlabcolor(str)
                   lcolor(str) lwidth(str) circcolor(str) circwidth(str) labgap(num) labsize(str)
                   title(str) subtitle(str) note(str) name(str)                              
                 ]
