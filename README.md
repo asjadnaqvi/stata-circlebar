@@ -10,10 +10,10 @@ This package allows us to draw circular bar graphs in Stata.
 
 The package can be installed via SSC or GitHub. The GitHub version, *might* be more recent due to bug fixes, feature updates etc, and *may* contain syntax improvements and changes in *default* values. See version numbers below. Eventually the GitHub version is published on SSC.
 
-SSC ():
+SSC (**v1.0**):
 
 ```
-Coming soon
+ssc install circlebar, replace
 ```
 
 GitHub (**v1.0**):
