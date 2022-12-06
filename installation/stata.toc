@@ -1,10 +1,9 @@
-v 1.0
+v 1.01
 d 'CIRCLEBAR': A package for creating circular bar graphs
-d
+d 06 Dec 2022
 d Asjad Naqvi
-d
 d asjadnaqvi@gmail.com
 d https://medium.com/the-stata-guide
-p joyplot
+p circlebar
 
 

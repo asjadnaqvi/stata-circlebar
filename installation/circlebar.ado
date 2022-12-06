@@ -1,6 +1,7 @@
-*! circlebar v1.0 (20 Nov 2022). Beta
+*! circlebar v1.01 (06 Dec 2022)
 *! Asjad Naqvi (asjadnaqvi@gmail.com)
 
+* v1.0 (20 Nov 2022). Beta
 
 **********************************
 
@@ -73,12 +74,12 @@ preserve
 		local stack stack2 
 	}
 	else {
-		// tempvar tempov stack2
+		tempvar tempst stack2
 		egen   stack2 = group(`stack')
 		
 		if "`: value label `stack''" != "" {
-			decode `stack', gen(`tempov')		
-			labmask stack2, val(`tempov')
+			decode `stack', gen(`tempst')		
+			labmask stack2, val(`tempst')
 		}
 		local stack stack2 
 	}

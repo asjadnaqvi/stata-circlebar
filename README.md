@@ -1,7 +1,7 @@
 
 ![StataMin](https://img.shields.io/badge/stata-2015-blue) ![issues](https://img.shields.io/github/issues/asjadnaqvi/stata-circlebar) ![license](https://img.shields.io/github/license/asjadnaqvi/stata-circlebar) ![Stars](https://img.shields.io/github/stars/asjadnaqvi/stata-circlebar) ![version](https://img.shields.io/github/v/release/asjadnaqvi/stata-circlebar) ![release](https://img.shields.io/github/release-date/asjadnaqvi/stata-circlebar)
 
-# circlebar v1.0 (beta)
+# circlebar v1.01
 
 This package allows us to draw circular bar graphs in Stata.
 
@@ -16,7 +16,7 @@ SSC (**v1.0**):
 ssc install circlebar, replace
 ```
 
-GitHub (**v1.0**):
+GitHub (**v1.01**):
 
 ```
 net install circlebar, from("https://raw.githubusercontent.com/asjadnaqvi/stata-circlebar/main/installation/") replace
@@ -48,7 +48,7 @@ graph set window fontface "Arial Narrow"
 
 ## Syntax
 
-The syntax for **v1.0** is as follows:
+The syntax for **v1.01** is as follows:
 
 ```
 
@@ -161,6 +161,9 @@ Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to 
 
 
 ## Versions
+
+**v1.01 (06 Dec 2022)**
+- Fixed several minor bugs, e.g. value labels of `stack()` variable were not passing correctly (reported by Asal Pilehvari).
 
 **v1.0 (20 Nov 2022)**
 - Public release. Currently in beta.

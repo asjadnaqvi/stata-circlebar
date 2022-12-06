@@ -1,7 +1,7 @@
 {smcl}
-{* 20November2022}{...}
+{* 06December2022}{...}
 {hi:help circlebar}{...}
-{right:{browse "https://github.com/asjadnaqvi/stata-circlebar":circlebar v1.0 (GitHub)}}
+{right:{browse "https://github.com/asjadnaqvi/stata-circlebar":circlebar v1.01 (GitHub)}}
 
 {hline}
 
@@ -106,14 +106,15 @@ See {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}.
 
 {title:Version history}
 
-- {bf:1.0} : First version.
+- {bf:1.01}: Minor fixes to bugs.
+- {bf:1.0} : First version. Beta release.
 
 
 
 {title:Package details}
 
-Version      : {bf:circlebar} v1.0
-This release : 20 Nov 2022
+Version      : {bf:circlebar} v1.01
+This release : 06 Dec 2022
 First release: 18 Nov 2021
 Repository   : {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}
 Keywords     : Stata, circle bar graphs
