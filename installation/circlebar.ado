@@ -1,6 +1,7 @@
 *! circlebar v1.01 (06 Dec 2022)
 *! Asjad Naqvi (asjadnaqvi@gmail.com)
 
+*                   : cfill(), labcolor()
 * v1.0 (20 Nov 2022). Beta
 
 **********************************
@@ -22,7 +23,8 @@ version 15
 		[ NOCIRCLABels CIRCLABFormat(string) CIRCLABSize(string) CIRCLABColor(string)  		]   ///
 		[ LABGap(real 5) LABSize(string) 					]	///
 		[ title(passthru) subtitle(passthru) note(passthru)	]	///
-		[ scheme(passthru) name(passthru) text(passthru) 	] 
+		[ scheme(passthru) name(passthru) text(passthru) 	]   ///
+		[ cfill(string) LABColor(string) ]    // v1.1 options
 		
 		
 	// check dependencies
@@ -34,14 +36,14 @@ version 15
 	
 	
 	if `radmin' >= `radmax' {
-		di as error  "{bf:radmin} >= {bf:radmax}. {it:radmin} > {it:radmax}."	
+		di as error  "{bf:radmin()} >= {bf:radmax()}. "	
 		exit 
 	}
 
 
 	cap findfile carryforward.ado
 	if _rc != 0 {
-		qui ssc install carryforward, replace -
+		qui ssc install carryforward, replace
 	}	
 	
 	marksample touse, strok
@@ -464,6 +466,8 @@ preserve
 	if "`circlabformat'" == "" local circlabformat %5.0f
 	if "`circlabsize'"   == "" local circlabsize  = 1.6
 	if "`circlabcolor'"  == "" local circlabcolor gs8
+	if "`labcolor'"  	 == "" local labcolor black
+	
 	
 	local gap2 = (`rhi' - 0) / (`circles' - 1)
 	
@@ -486,6 +490,8 @@ preserve
 	***    draw   ***
 	*****************
 	
+	if "`cfill'"  == "" local cfill white
+	
 	/////////////////
 	// pie labels  //
 	/////////////////
@@ -503,7 +509,7 @@ preserve
 				local angle = (r(mean)  * (180 / _pi)) + 255
 			}
 		 
-			local labs `labs' (scatter ylab`i' xlab`i', mc(none) mlabel(lab`i') mlabpos(0) mlabcolor(black) mlabangle(`angle')  mlabsize(`labsize'))  ///  // 
+			local labs `labs' (scatter ylab`i' xlab`i', mc(none) mlabel(lab`i') mlabpos(0) mlabcolor(`labcolor') mlabangle(`angle')  mlabsize(`labsize'))  ///  // 
 		  
 		} 
 	}
@@ -644,8 +650,8 @@ preserve
 		`areagraph' ///
 		`labs'		///
 		`rings2'	///
-			(function   sqrt(`radmin'^2 - (x)^2), recast(area) fc(white) fi(100) lw(0.2) lc(white) range(-`radmin' `radmin'))   ///
-			(function  -sqrt(`radmin'^2 - (x)^2), recast(area) fc(white) fi(100) lw(0.2) lc(white) range(-`radmin' `radmin'))   ///
+			(function   sqrt(`radmin'^2 - (x)^2), recast(area) fc(`cfill') fi(100) lw(0.2) lc(`cfill') range(-`radmin' `radmin'))   ///
+			(function  -sqrt(`radmin'^2 - (x)^2), recast(area) fc(`cfill') fi(100) lw(0.2) lc(`cfill') range(-`radmin' `radmin'))   ///
 			`circlabs'  ///
 					, ///
 						xsize(1) ysize(1) aspect(1)  /// 
