@@ -1,7 +1,14 @@
 
 ![StataMin](https://img.shields.io/badge/stata-2015-blue) ![issues](https://img.shields.io/github/issues/asjadnaqvi/stata-circlebar) ![license](https://img.shields.io/github/license/asjadnaqvi/stata-circlebar) ![Stars](https://img.shields.io/github/stars/asjadnaqvi/stata-circlebar) ![version](https://img.shields.io/github/v/release/asjadnaqvi/stata-circlebar) ![release](https://img.shields.io/github/release-date/asjadnaqvi/stata-circlebar)
 
-# circlebar v1.01
+
+---
+
+[Installation](#Installation) | [Syntax](#Syntax) | [Examples](#Examples) | [Feedback](#Feedback) | [Change log](#Change-log)
+
+---
+
+# circlebar v1.1
 
 This package allows us to draw circular bar graphs in Stata.
 
@@ -16,7 +23,7 @@ SSC (**v1.0**):
 ssc install circlebar, replace
 ```
 
-GitHub (**v1.01**):
+GitHub (**v1.1**):
 
 ```
 net install circlebar, from("https://raw.githubusercontent.com/asjadnaqvi/stata-circlebar/main/installation/") replace
@@ -48,18 +55,17 @@ graph set window fontface "Arial Narrow"
 
 ## Syntax
 
-The syntax for **v1.01** is as follows:
+The syntax for **v1.1** is as follows:
 
-```
-
+```applescript
 circlebar var [if] [in], by(var) [ stack(var) ]
                 [ radmin(num) radmax(num) circles(num) gap(num) alpha(num) palette(str)
                   nolabels rotatelabel showvalues nocircles  circtop nolegend range(num)
                   nocirclabels circlabformat(str) circlabsize(str) circlabcolor(str)
+                  cfill(str) labcolor(str) rotate(num)
                   lcolor(str) lwidth(str) circcolor(str) circwidth(str) labgap(num) labsize(str)
                   title(str) subtitle(str) note(str) name(str)                              
                 ]
-
 ```
 
 See the help file `help circlebar` for details.
@@ -140,11 +146,17 @@ circlebar deathspm, by(month) gap(2) palette(CET C6) rotatelab
 <img src="/figures/circlebar6.png" height="600">
 
 ```
+circlebar deathspm, by(month) stack(continent) gap(2) palette(CET C6) rotatelab
+```
+
+<img src="/figures/circlebar7.png" height="600">
+
+```
 circlebar deathspm, by(month) stack(continent) gap(1.5) radmin(5) palette(CET C6, n(6)) rotatelab lc(black) circc(gs13) ra(20000) ///
 text(0 0 "Global COVID-19" "{bf:deaths per million}" "in 2021" "(by continent)",  size(2.5)) note("Source: Our World in Data", size(2))
 ```
 
-<img src="/figures/circlebar7.png" height="600">
+<img src="/figures/circlebar7_1.png" height="600">
 
 ```
 circlebar deathspm, by(month) stack(continent) palette(tab Color Blind, n(6)) gap(0.5) radmin(4) radmax(10) ra(18000) ///
@@ -160,7 +172,13 @@ note("Source: Our World in Data", size(2)) circ(5) circc(gs13) labgap(8) rotatel
 Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to report errors, feature enhancements, and/or other requests. 
 
 
-## Versions
+## Change log
+
+**v1.1 (26 Feb 2023)**
+- Start slice defaults to the 12 o' clock position.
+- Option `rotate()` added to rotate the graph. Plus values are clockwise rotation.
+- Option `labcolor()` added.
+- Option `cfill()` added to change the color of the fill circle. This is useful if other backgrounds are used.
 
 **v1.01 (06 Dec 2022)**
 - Fixed several minor bugs, e.g. value labels of `stack()` variable were not passing correctly (reported by Asal Pilehvari).

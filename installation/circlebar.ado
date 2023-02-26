@@ -1,8 +1,9 @@
-*! circlebar v1.01 (06 Dec 2022)
+*! circlebar v1.1 (26 Feb 2023)
 *! Asjad Naqvi (asjadnaqvi@gmail.com)
 
-*                   : cfill(), labcolor()
-* v1.0 (20 Nov 2022). Beta
+* v1.1  (26 Feb 2023): added: cfill(), labcolor(), rotate(). label angle fixed. Various bug fixes.
+* v1.01 (06 Dec 2022): Minor fixes
+* v1.0  (20 Nov 2022): First release
 
 **********************************
 
@@ -24,7 +25,8 @@ version 15
 		[ LABGap(real 5) LABSize(string) 					]	///
 		[ title(passthru) subtitle(passthru) note(passthru)	]	///
 		[ scheme(passthru) name(passthru) text(passthru) 	]   ///
-		[ cfill(string) LABColor(string) ]    // v1.1 options
+		[ cfill(string) LABColor(string) ROtate(real 0) ]    // v1.1 options
+		
 		
 		
 	// check dependencies
@@ -123,7 +125,6 @@ preserve
 	
 	summ stackvar, meanonly
 	local maxval = r(max) // the maximum value of the height
-	*noi di "maximum stackvar value = `maxval'"
 				
 	levelsof `by'
 	scalar obs = `r(r)'
@@ -131,16 +132,7 @@ preserve
 	levelsof `stack'
 	scalar lvls = `r(r)'	
 	
-	di obs
-
-
-	*gen double height = stackvar // * obs  // / _pi // sqrt()  
-
-	
-
 	if "`range'" != "" {
-		*tokenize `range'
-		*local rlo `1'
 		local rhi `range'		
 		
 		summ stackvar, meanonly
@@ -149,8 +141,6 @@ preserve
 			noi di as err "The {bf:range} upper bound of `rhi' is lower than the maximum value `r(max)' in the data."
 			exit
 		}
-		
-		
 	}	
 	else {
 		summ stackvar, meanonly
@@ -166,15 +156,15 @@ preserve
 	
 	gen double theta = (1 / (_N / lvls)) * 2 * -_pi  // equally divide the pies	
 
-	
+	// default angle is automatically calculated to start at 12 in a clockwise direction
 	sort `stack' `by'
-	by `stack': gen double angle = sum(theta)
+	by `stack': gen double angle = sum(theta) - theta + (0.5 * _pi)  + (-`rotate' * _pi / 180)  
 	drop theta
 
 	gen double x =  radius * cos(angle) 
 	gen double y =  radius * sin(angle) 		
 	
-
+	
 	
 	local items = _N
 	
@@ -435,7 +425,13 @@ preserve
 		local y = `x' + 1 
 	  
 		gen double xlab`x' =  `labmax' * cos((angle`x' + angle`y') /2) in 1
-		gen double ylab`x' =  `labmax' * sin((angle`x' + angle`y') /2) in 1  
+		gen double ylab`x' =  `labmax' * sin((angle`x' + angle`y') /2) in 1 
+		
+		gen double  ang`x' =  .
+		replace ang`x' = (angle`x' + angle`y') /2 * (180 / _pi) + 180 in 1 if xlab`x' <= 0
+		replace ang`x' = (angle`x' + angle`y') /2 * (180 / _pi)       in 1 if xlab`x' > 0
+		
+		replace ang`x' = ang`x' - 360 if ang`x' > 360
 	  
 	  }
 
@@ -503,10 +499,10 @@ preserve
 	if "`nolabel'" == "" {
 		forval i = 1/`=scalar(obs)' {
 
-			
+			local j = `i' + 1	
 			if "`rotatelabel'" != "" {
-				qui summ angle`i', meanonly
-				local angle = (r(mean)  * (180 / _pi)) + 255
+				summ ang`i', meanonly
+				local angle = r(mean) 
 			}
 		 
 			local labs `labs' (scatter ylab`i' xlab`i', mc(none) mlabel(lab`i') mlabpos(0) mlabcolor(`labcolor') mlabangle(`angle')  mlabsize(`labsize'))  ///  // 
@@ -561,7 +557,6 @@ preserve
 		local circlabs (scatter yvar xvar, mc(none) mlab(xlab) mlabpos(0) mlabcolor(`circlabcolor') mlabsize(`circlabsize'))  
 		
 	}
-	
 	
 	
 	/////////////////
@@ -632,8 +627,7 @@ preserve
 			}
 			
 			colorpalette `palette', nograph `poptions'
-			
-			
+				
 			local areagraph`j' `areagraph`j'' (area y`i' x`i' if `stack'==`rev', nodropbase fi(100) fc("`r(p`clr')'%`alpha'") lc(`lcolor') lw(`lwidth')) ||
 			
 			
@@ -648,22 +642,21 @@ preserve
     twoway	///
 		`rings'	///
 		`areagraph' ///
-		`labs'		///
-		`rings2'	///
+		`rings2'	///	
 			(function   sqrt(`radmin'^2 - (x)^2), recast(area) fc(`cfill') fi(100) lw(0.2) lc(`cfill') range(-`radmin' `radmin'))   ///
 			(function  -sqrt(`radmin'^2 - (x)^2), recast(area) fc(`cfill') fi(100) lw(0.2) lc(`cfill') range(-`radmin' `radmin'))   ///
-			`circlabs'  ///
-					, ///
+			`circlabs'  ///		
+			`labs'		///							
+				, ///
 						xsize(1) ysize(1) aspect(1)  /// 
 						xscale(off) yscale(off) ///
 						xlabel(-`radmax' `radmax', nogrid) ///
 						ylabel(-`radmax' `radmax', nogrid) ///		
 						`legend' `title' `note' `subtitle' `text' `scheme' `name'
 						
-
+*/
 restore			
 }
-
 
 
 
