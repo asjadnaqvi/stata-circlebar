@@ -8,7 +8,7 @@
 
 ---
 
-# circlebar v1.1
+# circlebar v1.2
 
 This package allows us to draw circular bar graphs in Stata.
 
@@ -23,7 +23,7 @@ SSC (**v1.1**):
 ssc install circlebar, replace
 ```
 
-GitHub (**v1.1**):
+GitHub (**v1.2**):
 
 ```
 net install circlebar, from("https://raw.githubusercontent.com/asjadnaqvi/stata-circlebar/main/installation/") replace
@@ -55,7 +55,7 @@ graph set window fontface "Arial Narrow"
 
 ## Syntax
 
-The syntax for **v1.1** is as follows:
+The syntax for **v1.2** is as follows:
 
 ```applescript
 circlebar var [if] [in], by(var) [ stack(var) ]
@@ -76,7 +76,7 @@ The most basic use is as follows:
 circlebar values, by(var1) stack(var2)
 ```
 
-where `var1` and `var2` are the string source and destination variables respectively against which the `values` are plotted.
+where `var1` and `var2` are the string source and destination variables respectively against which the `values` are plotted. Please note that `circlebar` stacks the height. Areas should not be used for interpretting the results. If you prefer more accuracy, then a standard stacked bar graph is a better option.
 
 
 
@@ -173,6 +173,10 @@ Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to 
 
 
 ## Change log
+
+**v1.2 (23 Mar 2023)**
+- Fixed a major bug where the legend names were reversed (reported by Christina Lin).
+- Other minor code improvements.
 
 **v1.1 (26 Feb 2023)**
 - Start slice defaults to the 12 o' clock position.

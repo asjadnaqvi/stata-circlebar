@@ -1,6 +1,7 @@
-*! circlebar v1.1 (26 Feb 2023)
+*! circlebar v1.2 (23 Mar 2023)
 *! Asjad Naqvi (asjadnaqvi@gmail.com)
 
+* v1.2  (23 Mar 2023): fixed a bug where legend names were reversed. Improved other parts of the code.
 * v1.1  (26 Feb 2023): added: cfill(), labcolor(), rotate(). label angle fixed. Various bug fixes.
 * v1.01 (06 Dec 2022): Minor fixes
 * v1.0  (20 Nov 2022): First release
@@ -13,7 +14,7 @@
 cap program drop circlebar
 
 
-program circlebar, // sortpreserve
+program circlebar, sortpreserve
 
 version 15
  
@@ -570,8 +571,11 @@ preserve
 	
 		forval i = 1/`=scalar(lvls)' {
 		
-		local t : label `stack' `i' 
+		local rev = `=scalar(lvls)' - `i' + 1
+		
+		local t : label `stack' `rev' 
 		local k = `i' + ((`=scalar(obs)' - 1) * `j' ) + (`circles' * 2)
+		
 		
 			
 		local entries `" `entries' `k'  "`t'"  "'
@@ -580,8 +584,8 @@ preserve
 		
 		}
 	
-		local rows = cond(lvls <= 5, 1, 2)
-	
+		local rows = floor(lvls/5) + 1 
+		
 		local legend legend(order("`entries'") pos(6) size(2.5) row(`rows')) 
 	
 	}
@@ -590,7 +594,6 @@ preserve
 	}
 	
 
-	
 	/////////////////
 	// main layer  //
 	/////////////////
@@ -626,7 +629,7 @@ preserve
 				local clr `i'
 			}
 			
-			colorpalette `palette', nograph `poptions'
+			colorpalette `palette', nograph n(`items') `poptions' 
 				
 			local areagraph`j' `areagraph`j'' (area y`i' x`i' if `stack'==`rev', nodropbase fi(100) fc("`r(p`clr')'%`alpha'") lc(`lcolor') lw(`lwidth')) ||
 			

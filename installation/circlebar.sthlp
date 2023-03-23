@@ -1,7 +1,7 @@
 {smcl}
-{* 26Feb2023}{...}
+{* 23Mar2023}{...}
 {hi:help circlebar}{...}
-{right:{browse "https://github.com/asjadnaqvi/stata-circlebar":circlebar v1.1 (GitHub)}}
+{right:{browse "https://github.com/asjadnaqvi/stata-circlebar":circlebar v1.2 (GitHub)}}
 
 {hline}
 
@@ -113,6 +113,7 @@ See {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}.
 
 {title:Version history}
 
+- {bf:1.2} : Fixed a major bug where the legend names where reversed. Other code improvements.
 - {bf:1.1} : Starting slice recentered to 12 o' clock position. Options {opt cfill()}, {opt labcolor()}, {opt rotate()} added. 
 - {bf:1.01}: Minor fixes to bugs.
 - {bf:1.0} : First version. Beta release.
@@ -120,8 +121,8 @@ See {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}.
 
 {title:Package details}
 
-Version      : {bf:circlebar} v1.1
-This release : 26 Feb 2023
+Version      : {bf:circlebar} v1.2
+This release : 23 Mar 2023
 First release: 18 Nov 2022
 Repository   : {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}
 Keywords     : Stata, circle bar graphs
@@ -139,5 +140,13 @@ Please submit bugs, errors, feature requests on {browse "https://github.com/asja
 {title:References}
 
 {p 4 8 2}Jann, B. (2018). {browse "https://www.stata-journal.com/article.html?article=gr0075":Color palettes for Stata graphics}. The Stata Journal 18(4): 765-785.
+
+{p 4 8 2}Jann, B. (2022). {browse "https://ideas.repec.org/p/bss/wpaper/43.html":Color palettes for Stata graphics: an update}. University of Bern Social Sciences Working Papers No. 43. 
+
+{title:Other visualization packages}
+
+{psee}
+    {helpb arcplot}, {helpb alluvial}, {helpb bimap}, {helpb circlebar}, {helpb circlepack}, {helpb clipgeo}, {helpb delaunay}, {helpb joyplot}, 
+	{helpb marimekko}, {helpb sankey}, {helpb schemepack}, {helpb spider}, {helpb streamplot}, {helpb sunburst}, {helpb treecluster}, {helpb treemap}
 
 
