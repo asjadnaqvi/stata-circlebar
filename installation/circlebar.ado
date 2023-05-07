@@ -49,6 +49,11 @@ version 15
 		qui ssc install carryforward, replace
 	}	
 	
+	capture findfile labmask.ado
+	if _rc != 0 {
+		qui ssc install labutil, replace
+	}	
+	
 	marksample touse, strok
 	
 	
