@@ -1,6 +1,7 @@
 
-![StataMin](https://img.shields.io/badge/stata-2015-blue) ![issues](https://img.shields.io/github/issues/asjadnaqvi/stata-circlebar) ![license](https://img.shields.io/github/license/asjadnaqvi/stata-circlebar) ![Stars](https://img.shields.io/github/stars/asjadnaqvi/stata-circlebar) ![version](https://img.shields.io/github/v/release/asjadnaqvi/stata-circlebar) ![release](https://img.shields.io/github/release-date/asjadnaqvi/stata-circlebar)
+![circlebar-1](https://github.com/asjadnaqvi/stata-circlebar/assets/38498046/1c9420e0-d824-4918-b3c3-28a3bc83abf3)
 
+![StataMin](https://img.shields.io/badge/stata-2015-blue) ![issues](https://img.shields.io/github/issues/asjadnaqvi/stata-circlebar) ![license](https://img.shields.io/github/license/asjadnaqvi/stata-circlebar) ![Stars](https://img.shields.io/github/stars/asjadnaqvi/stata-circlebar) ![version](https://img.shields.io/github/v/release/asjadnaqvi/stata-circlebar) ![release](https://img.shields.io/github/release-date/asjadnaqvi/stata-circlebar)
 
 ---
 
@@ -9,6 +10,7 @@
 ---
 
 # circlebar v1.2
+(23 Mar 2023)
 
 This package allows us to draw circular bar graphs in Stata.
 
