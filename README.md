@@ -64,7 +64,7 @@ circlebar numvar [if] [in], by(var1) [ stack(var2) ]
                 [ radmin(num) radmax(num) circles(num) gap(num) alpha(num) palette(str) nolabels rotatelabel showvalues 
                   nocircles  circtop nolegend range(num) nocirclabels circlabformat(str) circlabsize(str) circlabcolor(str)
                   cfill(str) labcolor(str) rotate(num) lcolor(str) lwidth(str) circcolor(str) circwidth(str)
-                  labgap(num) labsize(str) title(str) subtitle(str) note(str) name(str) saving(str)  graphregion(str)                                     
+                  labgap(num) labsize(str) title(str) subtitle(str) note(str) name(str) saving(str) graphregion(str)                                     
                 ]
 ```
 
@@ -173,6 +173,10 @@ Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to 
 
 
 ## Change log
+
+**v1.21 (25 Sep 2023)**
+- Fixed a bug where `circtop` was resulting in wrong legend keys (reported by sktanamas).
+- Added `saving()` and `graphregion()` options.
 
 **v1.2 (23 Mar 2023)**
 - Fixed a major bug where the legend names were reversed (reported by Christina Lin).
