@@ -16,7 +16,7 @@
                 {cmd:[} {cmd:radmin}({it:num}) {cmd:radmax}({it:num}) {cmdab:circ:les}({it:num}) {cmd:gap}({it:num}) {cmd:alpha}({it:num}) {cmd:palette}({it:str}) {cmdab:nolab:els} {cmdab:rotatelab:el} {cmdab:showval:ues} 
                   {cmdab:nocirc:les}  {cmdab:circt:op} {cmdab:noleg:end} {cmdab:ra:nge}({it:num}) {cmdab:nocirclab:els} {cmdab:circlabf:ormat}({it:str}) {cmdab:circlabs:ize}({it:str}) {cmdab:circlabc:olor}({it:str})
                   {cmd:cfill}({it:str}) {cmdab:labc:olor}({it:str}) {cmdab:ro:tate}({it:num}) {cmdab:lc:olor}({it:str}) {cmdab:lw:idth}({it:str}) {cmdab:circc:olor}({it:str}) {cmdab:circw:idth}({it:str})
-                  {cmdab:labg:ap}({it:num}) {cmdab:labs:ize}({it:str}) {cmd:title}({it:str}) {cmd:subtitle}({it:str}) {cmd:note}({it:str}) {cmd:name}({it:str}) {cmd:saving}({it:str})  {cmd:graphregion}({it:str})		              		
+                  {cmdab:labg:ap}({it:num}) {cmdab:labs:ize}({it:str}) {cmd:title}({it:str}) {cmd:subtitle}({it:str}) {cmd:note}({it:str}) {cmd:name}({it:str}) {cmd:saving}({it:str}) {cmd:graphregion}({it:str})		              		
                 {cmd:]}
 
 {p 4 4 2}
