@@ -60,13 +60,11 @@ graph set window fontface "Arial Narrow"
 The syntax for the latest version is as follows:
 
 ```applescript
-circlebar var [if] [in], by(var) [ stack(var) ]
-                [ radmin(num) radmax(num) circles(num) gap(num) alpha(num) palette(str)
-                  nolabels rotatelabel showvalues nocircles  circtop nolegend range(num)
-                  nocirclabels circlabformat(str) circlabsize(str) circlabcolor(str)
-                  cfill(str) labcolor(str) rotate(num)
-                  lcolor(str) lwidth(str) circcolor(str) circwidth(str) labgap(num) labsize(str)
-                  title(str) subtitle(str) note(str) name(str)                              
+circlebar numvar [if] [in], by(var1) [ stack(var2) ]
+                [ radmin(num) radmax(num) circles(num) gap(num) alpha(num) palette(str) nolabels rotatelabel showvalues 
+                  nocircles  circtop nolegend range(num) nocirclabels circlabformat(str) circlabsize(str) circlabcolor(str)
+                  cfill(str) labcolor(str) rotate(num) lcolor(str) lwidth(str) circcolor(str) circwidth(str)
+                  labgap(num) labsize(str) title(str) subtitle(str) note(str) name(str) saving(str)  graphregion(str)                                     
                 ]
 ```
 
