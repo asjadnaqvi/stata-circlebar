@@ -1,7 +1,7 @@
 {smcl}
-{* 23Mar2023}{...}
+{* 25Sep2023}{...}
 {hi:help circlebar}{...}
-{right:{browse "https://github.com/asjadnaqvi/stata-circlebar":circlebar v1.2 (GitHub)}}
+{right:{browse "https://github.com/asjadnaqvi/stata-circlebar":circlebar v1.21 (GitHub)}}
 
 {hline}
 
@@ -12,13 +12,11 @@
 {marker syntax}{title:Syntax}
 {p 8 15 2}
 
-{cmd:circlebar} {it:var} {ifin}, {cmd:by}({it:var}) [ {cmd:stack}({it:var}) ]
-                {cmd:[} {cmd:radmin}({it:num}) {cmd:radmax}({it:num}) {cmdab:circ:les}({it:num}) {cmd:gap}({it:num}) {cmd:alpha}({it:num}) {cmd:palette}({it:str})
-                  {cmdab:nolab:els} {cmdab:rotatelab:el} {cmdab:showval:ues} {cmdab:nocirc:les}  {cmdab:circt:op} {cmdab:noleg:end} {cmdab:ra:nge}({it:num})
-                  {cmdab:nocirclab:els} {cmdab:circlabf:ormat}({it:str}) {cmdab:circlabs:ize}({it:str}) {cmdab:circlabc:olor}({it:str})
-                  {cmd:cfill}({it:str}) {cmdab:labc:olor}({it:str}) {cmdab:ro:tate}({it:num})
-                  {cmdab:lc:olor}({it:str}) {cmdab:lw:idth}({it:str}) {cmdab:circc:olor}({it:str}) {cmdab:circw:idth}({it:str}) {cmdab:labg:ap}({it:num}) {cmdab:labs:ize}({it:str})
-                  {cmd:title}({it:str}) {cmd:subtitle}({it:str}) {cmd:note}({it:str}) {cmd:name}({it:str}) 				
+{cmd:circlebar} {it:numvar} {ifin}, {cmd:by}({it:var1}) [ {cmd:stack}({it:var2}) ]
+                {cmd:[} {cmd:radmin}({it:num}) {cmd:radmax}({it:num}) {cmdab:circ:les}({it:num}) {cmd:gap}({it:num}) {cmd:alpha}({it:num}) {cmd:palette}({it:str}) {cmdab:nolab:els} {cmdab:rotatelab:el} {cmdab:showval:ues} 
+                  {cmdab:nocirc:les}  {cmdab:circt:op} {cmdab:noleg:end} {cmdab:ra:nge}({it:num}) {cmdab:nocirclab:els} {cmdab:circlabf:ormat}({it:str}) {cmdab:circlabs:ize}({it:str}) {cmdab:circlabc:olor}({it:str})
+                  {cmd:cfill}({it:str}) {cmdab:labc:olor}({it:str}) {cmdab:ro:tate}({it:num}) {cmdab:lc:olor}({it:str}) {cmdab:lw:idth}({it:str}) {cmdab:circc:olor}({it:str}) {cmdab:circw:idth}({it:str})
+                  {cmdab:labg:ap}({it:num}) {cmdab:labs:ize}({it:str}) {cmd:title}({it:str}) {cmd:subtitle}({it:str}) {cmd:note}({it:str}) {cmd:name}({it:str}) {cmd:saving}({it:str})  {cmd:graphregion}({it:str})		              		
                 {cmd:]}
 
 {p 4 4 2}
@@ -28,10 +26,8 @@
 {synopthdr}
 {synoptline}
 
-{p2coldent : {opt circlebar var, by(var1) stack(var2)}}The minimum syntax requires defining a numerical variable {it:varnum}.
-The placement around the circle is determined by the {it:by(var1)} variable.
-The pie slices can be stacked by the {it:stack(var2)} variable.
-If there is more data than is required, then the program will collapse the data using the mean value of the {it:varnum} by {it:var1} and {it:var2}.
+{p2coldent : {opt circlebar numvar, by(var1) stack(var2)}}The minimum syntax requires defining a numerical {it:numvar} variable. The placement around the circle is determined by the {it:by(var1)} variable.
+The pie slices can be stacked by the {it:stack(var2)} variable. If there is more data than is required, then the program will collapse the data using the mean value of the {it:varnum} by {it:var1} and {it:var2}.
 If you want other ways of summarizing the variables, then it is highly recommended to prepare the data beforehand.{p_end}
 
 {p2coldent : {opt range(num)}}The height of the circles can be controled by defining an upper bound using {opt range()}. This ensures that data can be made comparable across graphs.
@@ -113,15 +109,16 @@ See {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}.
 
 {title:Version history}
 
+- {bf:1.21}: Fixed a major bug where the legend keys were wrong if {opt circtop} was specified.
 - {bf:1.2} : Fixed a major bug where the legend names where reversed. Other code improvements.
 - {bf:1.1} : Starting slice recentered to 12 o' clock position. Options {opt cfill()}, {opt labcolor()}, {opt rotate()} added. 
-- {bf:1.01}: Minor fixes to bugs.
+- {bf:1.01}: Minor bug fixes.
 - {bf:1.0} : First version. Beta release.
 
 
 {title:Package details}
 
-Version      : {bf:circlebar} v1.2
+Version      : {bf:circlebar} v1.21
 This release : 23 Mar 2023
 First release: 18 Nov 2022
 Repository   : {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}
@@ -146,7 +143,7 @@ Please submit bugs, errors, feature requests on {browse "https://github.com/asja
 {title:Other visualization packages}
 
 {psee}
-    {helpb arcplot}, {helpb alluvial}, {helpb bimap}, {helpb circlebar}, {helpb circlepack}, {helpb clipgeo}, {helpb delaunay}, {helpb joyplot}, 
+    {helpb arcplot}, {helpb alluvial}, {helpb bimap}, {helpb bumparea}, {helpb bumpline}, {helpb circlebar}, {helpb circlepack}, {helpb clipgeo}, {helpb delaunay}, {helpb joyplot}, 
 	{helpb marimekko}, {helpb sankey}, {helpb schemepack}, {helpb spider}, {helpb streamplot}, {helpb sunburst}, {helpb treecluster}, {helpb treemap}
 
 

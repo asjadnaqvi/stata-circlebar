@@ -1,6 +1,7 @@
-*! circlebar v1.2 (23 Mar 2023)
+*! circlebar v1.21 (25 Sep 2023)
 *! Asjad Naqvi (asjadnaqvi@gmail.com)
 
+* v1.21 (25 Sep 2023): Fixed a bug where circtop was resulting in wrong legend keys.  saving(), graphregion() added.
 * v1.2  (23 Mar 2023): fixed a bug where legend names were reversed. Improved other parts of the code.
 * v1.1  (26 Feb 2023): added: cfill(), labcolor(), rotate(). label angle fixed. Various bug fixes.
 * v1.01 (06 Dec 2022): Minor fixes
@@ -25,7 +26,7 @@ version 15
 		[ NOCIRCLABels CIRCLABFormat(string) CIRCLABSize(string) CIRCLABColor(string)  		]   ///
 		[ LABGap(real 5) LABSize(string) 					]	///
 		[ title(passthru) subtitle(passthru) note(passthru)	]	///
-		[ scheme(passthru) name(passthru) text(passthru) 	]   ///
+		[ scheme(passthru) name(passthru) text(passthru) saving(passthru) graphregion(passthru) 	]   ///
 		[ cfill(string) LABColor(string) ROtate(real 0) ]    // v1.1 options
 		
 		
@@ -579,8 +580,12 @@ preserve
 		local rev = `=scalar(lvls)' - `i' + 1
 		
 		local t : label `stack' `rev' 
-		local k = `i' + ((`=scalar(obs)' - 1) * `j' ) + (`circles' * 2)
 		
+		
+		local shift = 0  // legend shift
+		if "`circtop'" == "" local shift = (`circles' * 2)	
+				
+		local k = `i' + ((`=scalar(obs)' - 1) * `j' ) + `shift'
 		
 			
 		local entries `" `entries' `k'  "`t'"  "'
@@ -599,6 +604,8 @@ preserve
 	}
 	
 
+	
+	
 	/////////////////
 	// main layer  //
 	/////////////////

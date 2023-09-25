@@ -9,7 +9,7 @@
 
 ---
 
-# circlebar v1.2
+# circlebar v1.21
 (23 Mar 2023)
 
 This package allows us to draw circular bar graphs in Stata.
@@ -25,7 +25,7 @@ SSC (**v1.2**):
 ssc install circlebar, replace
 ```
 
-GitHub (**v1.2**):
+GitHub (**v1.21**):
 
 ```
 net install circlebar, from("https://raw.githubusercontent.com/asjadnaqvi/stata-circlebar/main/installation/") replace
@@ -57,7 +57,7 @@ graph set window fontface "Arial Narrow"
 
 ## Syntax
 
-The syntax for **v1.2** is as follows:
+The syntax for the latest version is as follows:
 
 ```applescript
 circlebar var [if] [in], by(var) [ stack(var) ]
