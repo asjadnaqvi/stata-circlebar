@@ -1,6 +1,8 @@
-*! circlebar v1.21 (25 Sep 2023)
+*! circlebar v1.3 (22 Jan 2024)
 *! Asjad Naqvi (asjadnaqvi@gmail.com)
 
+
+* v1.3	(22 Jan 2024): rewrite of base routines, major code clean, support for unbalanced panels
 * v1.21 (25 Sep 2023): Fixed a bug where circtop was resulting in wrong legend keys.  saving(), graphregion() added.
 * v1.2  (23 Mar 2023): fixed a bug where legend names were reversed. Improved other parts of the code.
 * v1.1  (26 Feb 2023): added: cfill(), labcolor(), rotate(). label angle fixed. Various bug fixes.
@@ -27,14 +29,14 @@ version 15
 		[ LABGap(real 5) LABSize(string) 					]	///
 		[ title(passthru) subtitle(passthru) note(passthru)	]	///
 		[ scheme(passthru) name(passthru) text(passthru) saving(passthru) graphregion(passthru) 	]   ///
-		[ cfill(string) LABColor(string) ROtate(real 0) ]    // v1.1 options
-		
+		[ LABColor(string) ROtate(real 0) ] ///   // v1.1 options
+		[ CFill(string) CLColor(string) CLWidth(string)	points(real 500) ]			// v1.3 options
 		
 		
 	// check dependencies
 	capture findfile colorpalette.ado
 	if _rc != 0 {
-		display as error "The palettes package is missing. Install the {stata ssc install palettes, replace:palettes} and {stata ssc install colrspace, replace:colrspace} packages."
+		display as error "The {bf:palettes} package is missing. Install the {stata ssc install palettes, replace:palettes} and {stata ssc install colrspace, replace:colrspace} packages."
 		exit
 	}
 	
@@ -44,6 +46,7 @@ version 15
 		exit 
 	}
 
+	if "`radmin'" == "0" local radmin 0.01 // to avoid irregular outputs
 
 	cap findfile carryforward.ado
 	if _rc != 0 {
@@ -57,10 +60,17 @@ version 15
 	
 	marksample touse, strok
 	
-	
 qui {	
 preserve	
+
+	
 	keep if `touse'
+	keep `varlist' `by' `stack'  
+	
+	if "`stack'" != "" {
+		fillin `by' `stack' // tiangularize
+		recode `varlist' (.=0)
+	}
 	
 	// local options
 	
@@ -73,6 +83,7 @@ preserve
 		local ovrclr = 1
 	
 	}
+	
 	
 	
 	// finetune the stack variable
@@ -114,6 +125,8 @@ preserve
 		local by by2 
 	}			
 
+	
+	
 
 	// preserve the labels of the by variable
 	levelsof `by', local(idlabels)      // store the id levels
@@ -125,10 +138,10 @@ preserve
 
 	collapse (sum) `varlist', by(`by' `stack')
 	
-	sort `by' `stack'	
-				
-	by `by': gen double stackvar = sum(`varlist')				
-				
+					
+	bysort `by' (`stack'): gen double stackvar = sum(`varlist')				
+	
+	
 	
 	summ stackvar, meanonly
 	local maxval = r(max) // the maximum value of the height
@@ -158,21 +171,23 @@ preserve
 	gen double radius = (stackvar / `rhi')   
 	
 
+	
 	*** rescale radius to (a,b) = ((b - a)(x - xmin)/(xmax - xmin)) + a	
 	replace radius = ((`radmax' - `radmin') * (radius - 0) / (1 - 0)) + `radmin'
 	
 	gen double theta = (1 / (_N / lvls)) * 2 * -_pi  // equally divide the pies	
-
+	*gen temp2 = angle * 180 / _pi  // for recovering the full angle
+	
 	// default angle is automatically calculated to start at 12 in a clockwise direction
-	sort `stack' `by'
-	by `stack': gen double angle = sum(theta) - theta + (0.5 * _pi)  + (-`rotate' * _pi / 180)  
-	drop theta
 
+	bysort `stack' (`by'): gen double angle = sum(theta) // - theta  + (0.5 * _pi) + (-`rotate' * _pi / 180)  
+
+	drop theta
+	
 	gen double x =  radius * cos(angle) 
 	gen double y =  radius * sin(angle) 		
 	
-	
-	
+
 	local items = _N
 	
 	sum `by', meanonly
@@ -184,11 +199,19 @@ preserve
 	replace `by' = `maxval' if _n > `items'	
 	sort `stack' `by'
 	
+	gen dummy = `varlist' == 0
+	
+	
+	
 	drop `varlist' stackvar
 
+	
+	
 	gen id = 1
-	reshape wide x y radius angle, i(id `stack') j(`by')				
+	reshape wide x y radius angle dummy, i(id `stack') j(`by')				
 
+	
+	
 	expand 3		
 	sort `stack'
 	bysort `stack' : gen serial = _n
@@ -212,45 +235,7 @@ preserve
 		}			
 		
 		
-	***********************	
-	//   add gaps here	 //
-	***********************
-
-	// move the points in by `gap' degrees
-	cap drop *_temp*
-
-	scalar ro = `gap' * _pi / 180   
-
-
-	forval i = 1/`=scalar(obs)' {   
 		
-		gen double x`i'_temp = .
-		gen double y`i'_temp = .
-		
-			// move down		
-			replace x`i'_temp =  x`i' * cos(-ro) - y`i' * sin(-ro) if serial==2
-			replace y`i'_temp =  x`i' * sin(-ro) + y`i' * cos(-ro) if serial==2
-			
-			// move up	
-			replace x`i'_temp =  x`i' * cos( ro) - y`i' * sin( ro) if serial==3
-			replace y`i'_temp =  x`i' * sin( ro) + y`i' * cos( ro) if serial==3
-	
-	}			
-	
-	
-	
-	
-	forval i = 1/`=scalar(obs)' {   
-			replace x`i' = x`i'_temp if serial==2
-			replace y`i' = y`i'_temp if serial==2
-			
-			replace x`i' = x`i'_temp if serial==3
-			replace y`i' = y`i'_temp if serial==3	
-		
-	}
-
-	drop *temp	
-	
 	
 	****** get the arc right
 
@@ -259,168 +244,87 @@ preserve
 
 	local lastobs = _N
 
+	
+	
 	// expand the rows = 100 * categories
+		
 	levelsof `stack'
-	local obsnew = _N + 100 * lvls
+	local obsnew = _N + 97 * lvls
 	set obs  `obsnew'		// points for the arc. more points = smoother arc but slower
 
-	gen half = .
-
+	
 
 	forval i = 1 / `=scalar(lvls)' {
 		
 		// di "`i'"
 		
 		local start = `lastobs' + 1
-		local half  = `start'   + 49	
-		local end   = `start'   + 99
+		*local half  = `start'   + 44	
+		local end   = `start'   + 96
 		
 		replace `stack' = `i' in `start'/`end'
-		replace half    =  1  in `start'/`half'
+		*replace half    =  1  in `start'/`half'
 		
 		local lastobs = `end'
 		
 	}
 
-	replace half = 2 if half==.
+	*replace half = 2 if half==.
 
+	
+	
 	// extend the idenfiers
-	order `stack' serial half
+	order `stack' serial 
 
 	sort `stack' serial
-	carryforward radius*, replace	
+	carryforward radius* dummy*, replace	
 	
+
+	// generate the counters
+	cap drop counter
+	gen counter = mod(_n, 100)
+	recode counter (0 = 100)
 	
+		
+	levelsof stack2, local(lvls)
 	
-     *****************************
-	 ** generate the arc points **
-	 *****************************
-	 
-	 
-	levelsof `stack', local(lvls)
+	local ro = (`gap' / 2) * _pi / 180 
+	local start = 0 - `ro'
 
-	foreach k of local lvls {
+	forval i = 1/`=scalar(obs)' {  // 
+	
+		gen double angle`i'_new = .  // check 
+		gen double 	   x`i'_new = .  // check 
+		gen double 	   y`i'_new = .	 // check 
 		
-
-		
-	forval i = 1/`=scalar(obs)' {
-
-	cap drop x`i'_temp
-	cap drop y`i'_temp
-
-
-	qui gen x`i'_temp = .
-	qui gen y`i'_temp = .
-
-		
-	// "positive half top"
-
-		sum y`i' if y`i' != 0 & `stack'==`k', meanonly
-
-		
-		if r(min) >= 0 & r(max) >= 0 {		
-			sum x`i' if x`i' != 0 & `stack'==`k', meanonly
-			replace x`i'_temp = runiform(r(min) , r(max))			if `stack'==`k' 
-			replace y`i'_temp = sqrt((radius`i')^2 - (x`i'_temp)^2)	if `stack'==`k' 	
+		// arc start and end angles		
 			
-			replace x`i' = x`i'_temp if x`i'==. & `stack'==`k'
-			replace y`i' = y`i'_temp if y`i'==. & `stack'==`k'
+			summ angle`i', meanonly
+			local end = r(max) + `ro'
+	
+			local cuts = (`end' - `start') / 99
+	
+			replace angle`i'_new =  `start' + `cuts' * (counter - 2) if x1!=0
+			replace x`i'_new	 = radius`i' * cos(angle`i'_new)
+			replace y`i'_new	 = radius`i' * sin(angle`i'_new)			
 			
-
+			local start = `end' - 2 * `ro'
+	}	
+	
+		
+		
+		
+	////////////////////////
+	// replace and rotate //
+	////////////////////////
+	
+		forval i = 1/`=scalar(obs)' {  // 
+			replace x`i' = x`i'_new * cos(`rotate' * _pi / 180) - y`i'_new * sin(`rotate' * _pi / 180) if !missing(x`i'_new)
+			replace y`i' = x`i'_new * sin(`rotate' * _pi / 180) + y`i'_new * cos(`rotate' * _pi / 180) if !missing(y`i'_new)
 		}
-
-	// "negative half bottom"
-		else if r(min) < 0 & r(max) < 0 {		
-			sum x`i' if x`i' != 0  & `stack'==`k', meanonly
-			replace x`i'_temp = runiform(r(min) , r(max))				if `stack'==`k' 
-			replace y`i'_temp =  -sqrt((radius`i')^2 - (x`i'_temp)^2)	if `stack'==`k' 
-			
-			replace x`i' = x`i'_temp if x`i'==.  & `stack'==`k'
-			replace y`i' = y`i'_temp if y`i'==.  & `stack'==`k'
-			
-		}
-		
-
-	// "positive to negative"
-		else if r(min) < 0 & r(max) >= 0 {		
-			
-			sum x`i' if x`i' != 0 & y`i' >= 0 & `stack'==`k', meanonly
-			
-				if r(min) < 0 {
-					replace x`i'_temp = runiform(-1 * radius`i', r(min)) if half==1 & `stack'==`k'
-					}
-				
-				else {
-					replace x`i'_temp = runiform(r(min), radius`i') 	 if half==1 & `stack'==`k'
-					} 
-				
-			replace y`i'_temp =   sqrt((radius`i')^2 - (x`i'_temp)^2)	 if half==1 & `stack'==`k'
-			
-
-			
-			sum x`i' if x`i' != 0 & y`i' < 0 & `stack'==`k', meanonly
-			
-				if r(min) < 0 {
-					replace x`i'_temp = runiform(-radius`i', r(min)) 	 if half==2 & `stack'==`k'
-					}
-				
-				else {
-					replace x`i'_temp = runiform(r(min), radius`i')      if half==2 & `stack'==`k' 
-					} 
-			
-			replace y`i'_temp =   -sqrt((radius`i')^2 - (x`i'_temp)^2)   if half==2 & `stack'==`k' 
-			
-
-			replace x`i' = x`i'_temp if x`i'==. & `stack'==`k'
-			replace y`i' = y`i'_temp if y`i'==. & `stack'==`k'
-			
-		}
-	}				
-	}	 
-		
 	
-	drop half *temp
-	drop id	marker0		
-	bysort `stack': gen id = _n
+	drop *new
 	
-	
-	reshape long  x y angle radius, i(id `stack') j(arc)		
-	
-	
-	gen marker0 = 1 if x==0				
-	drop id			
-	sort arc marker0
-					
-	gen sortme = .		
-		
-// sorting based on the rules
-
-	levelsof  `stack', local(ws)
-	levelsof arc, local(lvls)
-
-	foreach x of local lvls {
-	foreach y of local  ws {	
-		
-		summ x if arc==`x' & `stack'==`y', meanonly
-
-			if r(max)> 0 & r(min) < 0 {
-				replace sortme = x if arc==`x' & `stack'==`y'
-				 }
-			else {
-				replace sortme = y if arc==`x' & `stack'==`y'
-				}
-			}		
-	}			
-					
-	sort `stack' arc marker0 sortme	
-	drop marker0				
-					
-	by `stack' arc: gen id = _n  
-						
-	reshape wide x y sortme angle radius serial, i(id `stack') j(arc)				
-		
-
-		
 	**********************	
 	// add pie labels	//
 	**********************
@@ -493,7 +397,7 @@ preserve
 	***    draw   ***
 	*****************
 	
-	if "`cfill'"  == "" local cfill white
+	
 	
 	/////////////////
 	// pie labels  //
@@ -521,10 +425,9 @@ preserve
 	//   circles   //
 	/////////////////
 	
-	
+
 	local rings
 	
-
 	if "`nocircle'" == "" {	
 	
 		if "`circcolor'" == "" local circcolor gs10
@@ -543,7 +446,7 @@ preserve
 	
 	
 	forval x = `radmin'(`gap')`radmax' {	
-		local rings `rings' (function sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`sides')) || (function -sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x')  n(`sides')) ||
+		local rings `rings' (function sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`points')) || (function -sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x')  n(`points')) ||
 
 		}		
 	
@@ -652,14 +555,23 @@ preserve
 	local areagraph `areagraph' `areagraph`j''   // collect in one local
 	}
 		
-		
+	
+	// circle fill
+	
+	if "`cfill'"  	== "" local cfill white
+	if "`clcolor'"  == "" local clcolor white
+	if "`clwidth'"  == "" local clwidth 0.2
+	
+	// final graph
 		
     twoway	///
 		`rings'	///
 		`areagraph' ///
 		`rings2'	///	
-			(function   sqrt(`radmin'^2 - (x)^2), recast(area) fc(`cfill') fi(100) lw(0.2) lc(`cfill') range(-`radmin' `radmin'))   ///
-			(function  -sqrt(`radmin'^2 - (x)^2), recast(area) fc(`cfill') fi(100) lw(0.2) lc(`cfill') range(-`radmin' `radmin'))   ///
+			(function   sqrt(`radmin'^2 - (x)^2), recast(area) fc(`cfill') fi(100) lw(0.3) lc(`cfill') range(-`radmin' `radmin'))   /// fill top
+			(function  -sqrt(`radmin'^2 - (x)^2), recast(area) fc(`cfill') fi(100) lw(0.3) lc(`cfill') range(-`radmin' `radmin'))   /// fill bot
+			(function   sqrt(`radmin'^2 - (x)^2), lw(`clwidth') lc(`clcolor') range(-`radmin' `radmin'))   ///	lc top
+			(function  -sqrt(`radmin'^2 - (x)^2), lw(`clwidth') lc(`clcolor') range(-`radmin' `radmin'))   ///	lc bot
 			`circlabs'  ///		
 			`labs'		///							
 				, ///
@@ -667,7 +579,7 @@ preserve
 						xscale(off) yscale(off) ///
 						xlabel(-`radmax' `radmax', nogrid) ///
 						ylabel(-`radmax' `radmax', nogrid) ///		
-						`legend' `title' `note' `subtitle' `text' `scheme' `name'
+						`legend' `title' `note' `subtitle' `text' `scheme' `name' `saving'
 						
 */
 restore			

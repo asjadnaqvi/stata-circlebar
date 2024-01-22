@@ -9,10 +9,10 @@
 
 ---
 
-# circlebar v1.21
-(25 Sep 2023)
+# circlebar v1.3
+(22 Jan 2024)
 
-This package allows us to draw circular bar graphs in Stata.
+This package allows us to draw bar graphs in Stata organized in polar coordinates.
 
 
 ## Installation
@@ -25,7 +25,7 @@ SSC (**v1.2**):
 ssc install circlebar, replace
 ```
 
-GitHub (**v1.21**):
+GitHub (**v1.3**):
 
 ```
 net install circlebar, from("https://raw.githubusercontent.com/asjadnaqvi/stata-circlebar/main/installation/") replace
@@ -59,12 +59,14 @@ graph set window fontface "Arial Narrow"
 
 The syntax for the latest version is as follows:
 
-```applescript
-circlebar numvar [if] [in], by(var1) [ stack(var2) ]
+```stata
+
+circlebar var [if] [in], by(var1) [ stack(var2) ]
                 [ radmin(num) radmax(num) circles(num) gap(num) alpha(num) palette(str) nolabels rotatelabel showvalues 
                   nocircles  circtop nolegend range(num) nocirclabels circlabformat(str) circlabsize(str) circlabcolor(str)
-                  cfill(str) labcolor(str) rotate(num) lcolor(str) lwidth(str) circcolor(str) circwidth(str)
-                  labgap(num) labsize(str) title(str) subtitle(str) note(str) name(str) saving(str) graphregion(str)                                     
+                  labcolor(str) rotate(num) lcolor(str) lwidth(str) circcolor(str) circwidth(str)
+                  labgap(num) labsize(str) cfill(str) clcolor(str)  clwidth(str) points(num)
+                  title(str) subtitle(str) note(str) name(str) saving(str) graphregion(str)                                   
                 ]
 ```
 
@@ -73,10 +75,10 @@ See the help file `help circlebar` for details.
 The most basic use is as follows:
 
 ```
-circlebar values, by(var1) stack(var2)
+circlebar variable, by(var1) [stack(var2)]
 ```
 
-where `var1` and `var2` are the string source and destination variables respectively against which the `values` are plotted. Please note that `circlebar` stacks the height. Areas should not be used for interpretting the results. If you prefer more accuracy, then a standard stacked bar graph is a better option.
+where `var1` and `var2` are the string source and destination variables respectively against which the numerical `variable` is plotted. Please note that `circlebar` stacks the height. Areas should not be used for interpretting the results. This might be implemented in the future.
 
 
 
@@ -164,7 +166,69 @@ text(0 0 "Global COVID-19" "{bf:deaths per million}" "in 2021" "(by continent)",
 note("Source: Our World in Data", size(2)) circ(5) circc(gs13) labgap(8) rotatelab labs(2.4) circlabf(%6.0fc)
 ```
 
-<img src="/figures/circlebar8.png" height="600">
+<img src="/figures/circlebar8.png" width="100%">
+
+
+### cfill options (v1.3)
+
+```
+circlebar deathspm, by(month) cfill(white) lc(black) clc(black) lw(0.1) clw(0.1)   //  name(m1, replace) 
+```
+
+<img src="/figures/circlebar9.png" width="100%">
+
+
+### fix to messy arcs with very few categories (v1.3)
+
+This updates fully fixes the issue with previous version where very few categories were resulting in distorted outputs.
+
+```
+use "https://github.com/asjadnaqvi/stata-circlebar/blob/main/data/demo_r_pjangrp3_clean?raw=true", clear
+
+drop year
+keep NUTS_ID y_TOT
+
+drop if y_TOT==0
+
+keep if length(NUTS_ID)==5
+
+gen NUTS2 = substr(NUTS_ID, 1, 4)
+gen NUTS1 = substr(NUTS_ID, 1, 3)
+gen NUTS0 = substr(NUTS_ID, 1, 2)
+ren NUTS_ID NUTS3
+
+```
+
+
+```
+circlebar y_TOT if NUTS0=="IT", by(NUTS1) alpha(80)
+```
+
+<img src="/figures/circlebar10.png" width="100%">
+
+
+```
+circlebar y_TOT if NUTS0=="AT", by(NUTS1) alpha(80)
+```
+
+<img src="/figures/circlebar11.png" width="100%">
+
+// unbalanced stacks (v1.3)
+
+Another major feature request was to allow plotting stacks that are unique to each `by()` category. This has now been added:
+
+```
+circlebar y_TOT if NUTS0=="AT", by(NUTS1) stack(NUTS2) 
+```
+
+<img src="/figures/circlebar12.png" width="100%">
+
+```
+circlebar y_TOT if NUTS0=="IT", radmin(0) gap(0) by(NUTS1) stack(NUTS2)  
+```
+
+<img src="/figures/circlebar13.png" width="100%">
+
 
 
 ## Feedback
@@ -173,6 +237,11 @@ Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to 
 
 
 ## Change log
+
+**v1.3 (22 Jan 2024)**
+- Complete rework of the base engine for drawing arcs. The program is now very stable and faster.
+- Several new options added to control the circle fill including assigning border colors and line widths.
+- Clean up of redundant code.
 
 **v1.21 (25 Sep 2023)**
 - Fixed a bug where `circtop` was resulting in wrong legend keys (reported by sktanamas).
