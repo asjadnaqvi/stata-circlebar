@@ -213,7 +213,7 @@ circlebar y_TOT if NUTS0=="AT", by(NUTS1) alpha(80)
 
 <img src="/figures/circlebar11.png" width="100%">
 
-// unbalanced stacks (v1.3)
+### unbalanced stacks (v1.3)
 
 Another major feature request was to allow plotting stacks that are unique to each `by()` category. This has now been added:
 
