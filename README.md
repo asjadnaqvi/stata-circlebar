@@ -19,7 +19,7 @@ This package allows us to draw bar graphs in Stata organized in polar coordinate
 
 The package can be installed via SSC or GitHub. The GitHub version, *might* be more recent due to bug fixes, feature updates etc, and *may* contain syntax improvements and changes in *default* values. See version numbers below. Eventually the GitHub version is published on SSC.
 
-SSC (**v1.2**):
+SSC (**v1.3**):
 
 ```
 ssc install circlebar, replace
@@ -96,69 +96,69 @@ Let's test the `circlebar` command:
 circlebar deathspm, by(month) 
 ```
 
-<img src="/figures/circlebar1.png" height="600">
+<img src="/figures/circlebar1.png" width="100%">
 
 ```
 circlebar deathspm, by(month) nocirclab
 ```
 
-<img src="/figures/circlebar1_1.png" height="600">
+<img src="/figures/circlebar1_1.png" width="100%">
 
 
 ```
 circlebar deathspm, by(month) radmin(0)
 ```
 
-<img src="/figures/circlebar2.png" height="600">
+<img src="/figures/circlebar2.png" width="100%">
 
 ```
 circlebar deathspm, by(month) gap(0.5)
 ```
 
-<img src="/figures/circlebar3.png" height="600">
+<img src="/figures/circlebar3.png" width="100%">
 
 ```
 circlebar deathspm, by(month) gap(0.5) alpha(80) circles(6) circlabf(%6.0fc)
 ```
 
-<img src="/figures/circlebar4.png" height="600">
+<img src="/figures/circlebar4.png" width="100%">
 
 ```
 circlebar deathspm, by(month) gap(0.5) circles(6) circtop
 ```
 
-<img src="/figures/circlebar4_1.png" height="600">
+<img src="/figures/circlebar4_1.png" width="100%">
 
 ```
 circlebar deathspm, by(month) gap(0.5) circles(4) ra(18000) nocirclab
 ```
 
-<img src="/figures/circlebar4_2.png" height="600">
+<img src="/figures/circlebar4_2.png" width="100%">
 
 ```
 circlebar deathspm, by(month) gap(0.5) palette(CET C6) nocirclab
 ```
 
-<img src="/figures/circlebar5.png" height="600">
+<img src="/figures/circlebar5.png" width="100%">
 
 ```
 circlebar deathspm, by(month) gap(2) palette(CET C6) rotatelab
 ```
 
-<img src="/figures/circlebar6.png" height="600">
+<img src="/figures/circlebar6.png" width="100%">
 
 ```
 circlebar deathspm, by(month) stack(continent) gap(2) palette(CET C6) rotatelab
 ```
 
-<img src="/figures/circlebar7.png" height="600">
+<img src="/figures/circlebar7.png" width="100%">
 
 ```
 circlebar deathspm, by(month) stack(continent) gap(1.5) radmin(5) palette(CET C6, n(6)) rotatelab lc(black) circc(gs13) ra(20000) ///
 text(0 0 "Global COVID-19" "{bf:deaths per million}" "in 2021" "(by continent)",  size(2.5)) note("Source: Our World in Data", size(2))
 ```
 
-<img src="/figures/circlebar7_1.png" height="600">
+<img src="/figures/circlebar7_1.png" width="100%">
 
 ```
 circlebar deathspm, by(month) stack(continent) palette(tab Color Blind, n(6)) gap(0.5) radmin(4) radmax(10) ra(18000) ///
