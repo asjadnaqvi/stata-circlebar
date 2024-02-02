@@ -1,6 +1,6 @@
-v 1.3
-d 'CIRCLEBAR': A Stata package for stacked circular bar graphs
-d Distribution-Date: 20240122
+v 1.31
+d 'CIRCLEBAR': A Stata package for polar bar graphs
+d Distribution-Date: 20240202
 d Asjad Naqvi
 d asjadnaqvi@gmail.com
 d https://medium.com/the-stata-guide

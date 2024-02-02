@@ -9,7 +9,7 @@
 
 ---
 
-# circlebar v1.3
+# circlebar v1.31
 (22 Jan 2024)
 
 This package allows us to draw bar graphs in Stata organized in polar coordinates.
@@ -25,7 +25,7 @@ SSC (**v1.3**):
 ssc install circlebar, replace
 ```
 
-GitHub (**v1.3**):
+GitHub (**v1.31**):
 
 ```
 net install circlebar, from("https://raw.githubusercontent.com/asjadnaqvi/stata-circlebar/main/installation/") replace
@@ -237,6 +237,10 @@ Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to 
 
 
 ## Change log
+
+**v1.31 (02 Feb 2024)**
+- Fixed the label bug which was off by one slice.
+- Minor cleanups.
 
 **v1.3 (22 Jan 2024)**
 - Complete rework of the base engine for drawing arcs. The program is now very stable and faster.

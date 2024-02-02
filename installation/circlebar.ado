@@ -1,7 +1,7 @@
-*! circlebar v1.3 (22 Jan 2024)
+*! circlebar v1.31 (02 Feb 2024)
 *! Asjad Naqvi (asjadnaqvi@gmail.com)
 
-
+* v1.31				 : labels need to be rotated by one. Added ability to sort by height
 * v1.3	(22 Jan 2024): rewrite of base routines, major code clean, support for unbalanced panels
 * v1.21 (25 Sep 2023): Fixed a bug where circtop was resulting in wrong legend keys.  saving(), graphregion() added.
 * v1.2  (23 Mar 2023): fixed a bug where legend names were reversed. Improved other parts of the code.
@@ -30,7 +30,7 @@ version 15
 		[ title(passthru) subtitle(passthru) note(passthru)	]	///
 		[ scheme(passthru) name(passthru) text(passthru) saving(passthru) graphregion(passthru) 	]   ///
 		[ LABColor(string) ROtate(real 0) ] ///   // v1.1 options
-		[ CFill(string) CLColor(string) CLWidth(string)	points(real 500) ]			// v1.3 options
+		[ CFill(string) CLColor(string) CLWidth(string)	points(real 500) half  ]			// v1.3 options
 		
 		
 	// check dependencies
@@ -46,7 +46,7 @@ version 15
 		exit 
 	}
 
-	if "`radmin'" == "0" local radmin 0.01 // to avoid irregular outputs
+	if "`radmin'" == "0" local radmin 0.01 // to avoid irregular outputs...
 
 	cap findfile carryforward.ado
 	if _rc != 0 {
@@ -140,8 +140,7 @@ preserve
 	
 					
 	bysort `by' (`stack'): gen double stackvar = sum(`varlist')				
-	
-	
+
 	
 	summ stackvar, meanonly
 	local maxval = r(max) // the maximum value of the height
@@ -170,47 +169,46 @@ preserve
 	
 	gen double radius = (stackvar / `rhi')   
 	
+	local 2pi = 2
 
+	if "`half'"!= "" local 2pi -1
 	
 	*** rescale radius to (a,b) = ((b - a)(x - xmin)/(xmax - xmin)) + a	
 	replace radius = ((`radmax' - `radmin') * (radius - 0) / (1 - 0)) + `radmin'
 	
-	gen double theta = (1 / (_N / lvls)) * 2 * -_pi  // equally divide the pies	
-	*gen temp2 = angle * 180 / _pi  // for recovering the full angle
-	
-	// default angle is automatically calculated to start at 12 in a clockwise direction
+	gen double theta = (1 / (_N / lvls)) * `2pi' * -_pi  // equally divide the pies. full angle = 	angle * 180 / _pi
 
 	bysort `stack' (`by'): gen double angle = sum(theta) // - theta  + (0.5 * _pi) + (-`rotate' * _pi / 180)  
 
-	drop theta
-	
 	gen double x =  radius * cos(angle) 
 	gen double y =  radius * sin(angle) 		
 	
-
+	drop theta
+	
+	 
 	local items = _N
 	
 	sum `by', meanonly
 	local maxval = r(max) + 1
 	
-
+	
 	expand 2 if `by'==1 
 
+	
 	replace `by' = `maxval' if _n > `items'	
 	sort `stack' `by'
 	
+	
 	gen dummy = `varlist' == 0
 	
-	
-	
 	drop `varlist' stackvar
+	
 
-	
-	
 	gen id = 1
+	
+	
 	reshape wide x y radius angle dummy, i(id `stack') j(`by')				
 
-	
 	
 	expand 3		
 	sort `stack'
@@ -234,17 +232,14 @@ preserve
 		
 		}			
 		
-		
-		
+	
 	
 	****** get the arc right
-
 
 	gen marker0 = 0 in 1	// identify the origin. important for sorting later
 
 	local lastobs = _N
 
-	
 	
 	// expand the rows = 100 * categories
 		
@@ -256,21 +251,13 @@ preserve
 
 	forval i = 1 / `=scalar(lvls)' {
 		
-		// di "`i'"
-		
 		local start = `lastobs' + 1
-		*local half  = `start'   + 44	
 		local end   = `start'   + 96
-		
 		replace `stack' = `i' in `start'/`end'
-		*replace half    =  1  in `start'/`half'
 		
 		local lastobs = `end'
 		
 	}
-
-	*replace half = 2 if half==.
-
 	
 	
 	// extend the idenfiers
@@ -293,9 +280,9 @@ preserve
 
 	forval i = 1/`=scalar(obs)' {  // 
 	
-		gen double angle`i'_new = .  // check 
-		gen double 	   x`i'_new = .  // check 
-		gen double 	   y`i'_new = .	 // check 
+		gen double angle`i'_new = .  
+		gen double 	   x`i'_new = .  
+		gen double 	   y`i'_new = .	 
 		
 		// arc start and end angles		
 			
@@ -312,7 +299,7 @@ preserve
 	}	
 	
 		
-		
+	
 		
 	////////////////////////
 	// replace and rotate //
@@ -323,40 +310,49 @@ preserve
 			replace y`i' = x`i'_new * sin(`rotate' * _pi / 180) + y`i'_new * cos(`rotate' * _pi / 180) if !missing(y`i'_new)
 		}
 	
+
 	drop *new
 	
+
 	**********************	
 	// add pie labels	//
 	**********************
 	
 	cap drop xlab* ylab*
+	
+	gen angle0 = 0 in 1
+	local astart = 0
+	
 	forval x = 1/`=scalar(obs)' {
 	 
 		local labmax =  `radmax' * (1 + `labgap' / 100) //  push out the labels 
-		local y = `x' + 1 
 	  
-		gen double xlab`x' =  `labmax' * cos((angle`x' + angle`y') /2) in 1
-		gen double ylab`x' =  `labmax' * sin((angle`x' + angle`y') /2) in 1 
+		local aend = `x'
+	  
+		di "`astart' - `aend'"
+	  
+		gen double xlab`x' =  `labmax' * cos((angle`astart' + angle`aend') /2) in 1
+		gen double ylab`x' =  `labmax' * sin((angle`astart' + angle`aend') /2) in 1 
 		
 		gen double  ang`x' =  .
-		replace ang`x' = (angle`x' + angle`y') /2 * (180 / _pi) + 180 in 1 if xlab`x' <= 0
-		replace ang`x' = (angle`x' + angle`y') /2 * (180 / _pi)       in 1 if xlab`x' > 0
+		replace ang`x' = (angle`astart' + angle`aend') / 2 * (180 / _pi) + 180 in 1 if xlab`x' <= 0
+		replace ang`x' = (angle`astart' + angle`aend') / 2 * (180 / _pi)       in 1 if xlab`x' > 0
 		
-		replace ang`x' = ang`x' - 360 if ang`x' > 360
+		*replace ang`x' = ang`x' - 360 if ang`x' > 360
 	  
-	  }
+	  
+		local astart = `aend'
+	  
+	}
+	  
+	drop angle0
 
-	  replace ylab`=scalar(obs)' = ylab`=scalar(obs)' * -1
-	  replace xlab`=scalar(obs)' = xlab`=scalar(obs)' * -1	
-		
-	 cap drop lab*
+	cap drop lab*
    
 		forval i = 1/`=scalar(obs)' {
 			
 			if "`idlab_`i''" != "" {
-				
 				gen lab`i' = "`idlab_`i''" in 1	
-				
 			}
 			else {
 				gen lab`i' = `i' in 1
@@ -421,6 +417,9 @@ preserve
 		} 
 	}
 	
+
+	
+	
 	/////////////////
 	//   circles   //
 	/////////////////
@@ -446,8 +445,14 @@ preserve
 	
 	
 	forval x = `radmin'(`gap')`radmax' {	
-		local rings `rings' (function sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`points')) || (function -sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x')  n(`points')) ||
-
+		
+		if "`half'" == "" {
+			local rings `rings' (function sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`points')) || (function -sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x')  n(`points')) ||
+		}
+		else {
+			local rings `rings' (function sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`points'))
+		}
+		
 		}		
 	
 	}
@@ -554,7 +559,6 @@ preserve
 	
 	local areagraph `areagraph' `areagraph`j''   // collect in one local
 	}
-		
 	
 	// circle fill
 	
@@ -562,30 +566,39 @@ preserve
 	if "`clcolor'"  == "" local clcolor white
 	if "`clwidth'"  == "" local clwidth 0.2
 	
+		local fill 							(function   sqrt(`radmin'^2 - (x)^2), recast(area)  fc(`cfill') fi(100) lw(0.3) lc(`cfill') range(-`radmin' `radmin'))  //  fill top
+		if "`half'"=="" local fill `fill'   (function  -sqrt(`radmin'^2 - (x)^2), recast(area)  fc(`cfill') fi(100) lw(0.3) lc(`cfill') range(-`radmin' `radmin'))  //  fill bot
+		local fill `fill' 					(function   sqrt(`radmin'^2 - (x)^2), lw(`clwidth') lc(`clcolor') range(-`radmin' `radmin'))  //	lc top
+		if "`half'"=="" local fill `fill'   (function  -sqrt(`radmin'^2 - (x)^2), lw(`clwidth') lc(`clcolor') range(-`radmin' `radmin'))  //	lc bot	
+	
+	
+	local ysize 1
+	local xsize 1
+
+	if "`half'"!="" {
+		
+		local xsize 2
+	}
+	
 	// final graph
 		
-    twoway	///
-		`rings'	///
-		`areagraph' ///
-		`rings2'	///	
-			(function   sqrt(`radmin'^2 - (x)^2), recast(area) fc(`cfill') fi(100) lw(0.3) lc(`cfill') range(-`radmin' `radmin'))   /// fill top
-			(function  -sqrt(`radmin'^2 - (x)^2), recast(area) fc(`cfill') fi(100) lw(0.3) lc(`cfill') range(-`radmin' `radmin'))   /// fill bot
-			(function   sqrt(`radmin'^2 - (x)^2), lw(`clwidth') lc(`clcolor') range(-`radmin' `radmin'))   ///	lc top
-			(function  -sqrt(`radmin'^2 - (x)^2), lw(`clwidth') lc(`clcolor') range(-`radmin' `radmin'))   ///	lc bot
+    twoway				///
+		`rings'			///
+		`areagraph' 	///
+		`rings2'		///	
+		`fill'			///
 			`circlabs'  ///		
 			`labs'		///							
-				, ///
-						xsize(1) ysize(1) aspect(1)  /// 
-						xscale(off) yscale(off) ///
-						xlabel(-`radmax' `radmax', nogrid) ///
-						ylabel(-`radmax' `radmax', nogrid) ///		
-						`legend' `title' `note' `subtitle' `text' `scheme' `name' `saving'
+				, 		///
+					xsize(`xsize') ysize(`ysize') aspect(1)  /// 
+					xscale(off) yscale(off) ///
+					xlabel(-`radmax' `radmax', nogrid) ///
+					ylabel(-`radmax' `radmax', nogrid) ///		
+					`legend' `title' `note' `subtitle' `text' `scheme' `name' `saving'
 						
 */
 restore			
 }
-
-
 
 end
 

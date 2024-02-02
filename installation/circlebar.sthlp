@@ -1,11 +1,11 @@
 {smcl}
-{* 22Jan2024}{...}
+{* 02Feb2024}{...}
 {hi:help circlebar}{...}
-{right:{browse "https://github.com/asjadnaqvi/stata-circlebar":circlebar v1.3 (GitHub)}}
+{right:{browse "https://github.com/asjadnaqvi/stata-circlebar":circlebar v1.31 (GitHub)}}
 
 {hline}
 
-{title:circlebar}: A Stata package for circular bar graphs.
+{title:circlebar}: A Stata package for polar bar graphs.
 
 
 
@@ -80,13 +80,13 @@ Default value is {opt alpha(100)}. Use this carefully with the {it:stack()} opti
 {p2coldent : {opt circlw:idth(str)}}Line width of the circles. Default value is {opt circlw(0.1)}.{p_end}
 
 {p2coldent : {opt cf:ill(str)}}The fill color of the center circle. Default value is {opt cfill(white)}.
-This option is especially useful when other background colors are used.{p_end}
+This option is especially useful if a non-white background is used.{p_end}
 
-{p2coldent : {opt clc:olor(str)}}Line color of the center circle line. Default is {opt clc:olor(white)}.
+{p2coldent : {opt clc:olor(str)}}Line color of the center circle line. Default is {opt clc(white)}.{p_end}
 
-{p2coldent : {opt clw:idth(str)}}Line with of the center circle line. Default is {opt clw:idth(0.2)}.
+{p2coldent : {opt clw:idth(str)}}Line with of the center circle line. Default is {opt clw(0.2)}.{p_end}
 
-{p2coldent : {opt points(num)}}Advanced option for setting the number of points to generate the circles. Default is {opt points(500)} which works fine for general use. 
+{p2coldent : {opt points(num)}}Advanced option for setting the number of points to generate the circles. Default is {opt points(500)} which works fine for general use.{p_end} 
 
 {p2coldent : {opt title()}, {opt subtitle()}, {opt note()}, {opt text()}}These are standard twoway graph options. {opt text} can be used to add text to the middle of the circles.{p_end}
 
@@ -126,8 +126,8 @@ See {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}.
 
 {title:Package details}
 
-Version      : {bf:circlebar} v1.3
-This release : 22 Jan 2024
+Version      : {bf:circlebar} v1.31
+This release : 02 Feb 2024
 First release: 18 Nov 2022
 Repository   : {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}
 Keywords     : Stata, circle bar graphs
