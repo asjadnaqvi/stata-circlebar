@@ -241,7 +241,7 @@ Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to 
 **v1.4  (03 Feb 2024)**
 - Better legend options.
 
-**v1.31 (02 Feb 2024) HOTFIX! **
+**v1.31 (02 Feb 2024) HOTFIX!**
 - Fixed the label bug which was off by one slice.
 - Minor cleanups.
 
