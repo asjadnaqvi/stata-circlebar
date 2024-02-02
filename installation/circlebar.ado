@@ -1,7 +1,8 @@
-*! circlebar v1.31 (02 Feb 2024)
+*! circlebar v1.4 (02 Feb 2024)
 *! Asjad Naqvi (asjadnaqvi@gmail.com)
 
-* v1.31				 : labels need to be rotated by one. Added ability to sort by height
+* v1.4  (03 Feb 2024): better legend options added. other code cleanup. 
+* v1.31	(02 Feb 2024): labels need to be rotated by one. Added ability to sort by height
 * v1.3	(22 Jan 2024): rewrite of base routines, major code clean, support for unbalanced panels
 * v1.21 (25 Sep 2023): Fixed a bug where circtop was resulting in wrong legend keys.  saving(), graphregion() added.
 * v1.2  (23 Mar 2023): fixed a bug where legend names were reversed. Improved other parts of the code.
@@ -30,8 +31,8 @@ version 15
 		[ title(passthru) subtitle(passthru) note(passthru)	]	///
 		[ scheme(passthru) name(passthru) text(passthru) saving(passthru) graphregion(passthru) 	]   ///
 		[ LABColor(string) ROtate(real 0) ] ///   // v1.1 options
-		[ CFill(string) CLColor(string) CLWidth(string)	points(real 500) half  ]			// v1.3 options
-		
+		[ CFill(string) CLColor(string) CLWidth(string)	points(real 500)   ]	///		// v1.3 options
+		[ rows(real 3) LEGSize(string) LEGPOSition(string) half sort ]   // v1.4 options. last two are currently undocumented
 		
 	// check dependencies
 	capture findfile colorpalette.ado
@@ -479,6 +480,9 @@ preserve
 	/////////////////
 	
 	
+	if "`legsize'" 		== "" local legsize 2.2
+	if "`legposition'" 	== "" local legposition 6
+	
 	if "`nolegend'" == "" & `ovrclr' == 0 {
 	
 		local j = 0
@@ -502,9 +506,9 @@ preserve
 		
 		}
 	
-		local rows = floor(lvls/5) + 1 
+		*local rows = floor(lvls/`rows') + 1 
 		
-		local legend legend(order("`entries'") pos(6) size(2.5) row(`rows')) 
+		local legend legend(order("`entries'") pos(`legposition') size(`legsize') row(`rows')) 
 	
 	}
 	else {

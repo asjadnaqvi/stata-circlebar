@@ -9,8 +9,8 @@
 
 ---
 
-# circlebar v1.31
-(02 Feb 2024)
+# circlebar v1.4
+(03 Feb 2024) - work in progress
 
 A package for polar bar graphs in Stata.
 
@@ -25,7 +25,7 @@ SSC (**v1.3**):
 ssc install circlebar, replace
 ```
 
-GitHub (**v1.31**):
+GitHub (**v1.4**):
 
 ```
 net install circlebar, from("https://raw.githubusercontent.com/asjadnaqvi/stata-circlebar/main/installation/") replace
@@ -60,12 +60,12 @@ graph set window fontface "Arial Narrow"
 The syntax for the latest version is as follows:
 
 ```stata
-
 circlebar var [if] [in], by(var1) [ stack(var2) ]
                 [ radmin(num) radmax(num) circles(num) gap(num) alpha(num) palette(str) nolabels rotatelabel showvalues 
-                  nocircles  circtop nolegend range(num) nocirclabels circlabformat(str) circlabsize(str) circlabcolor(str)
+                  nocircles  circtop range(num) nocirclabels circlabformat(str) circlabsize(str) circlabcolor(str)
                   labcolor(str) rotate(num) lcolor(str) lwidth(str) circcolor(str) circwidth(str)
-                  labgap(num) labsize(str) cfill(str) clcolor(str)  clwidth(str) points(num)
+                  labgap(num) labsize(str) cfill(str) clcolor(str)  clwidth(str) points(num) 
+                  nolegend rows(num) legsize(str) legposition(str)
                   title(str) subtitle(str) note(str) name(str) saving(str) graphregion(str)                                   
                 ]
 ```
@@ -238,7 +238,10 @@ Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to 
 
 ## Change log
 
-**v1.31 (02 Feb 2024)**
+**v1.4  (03 Feb 2024)**
+- Better legend options.
+
+**v1.31 (02 Feb 2024) HOTFIX! **
 - Fixed the label bug which was off by one slice.
 - Minor cleanups.
 

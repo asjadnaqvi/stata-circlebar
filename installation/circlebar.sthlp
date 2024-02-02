@@ -1,7 +1,7 @@
 {smcl}
-{* 02Feb2024}{...}
+{* 03Feb2024}{...}
 {hi:help circlebar}{...}
-{right:{browse "https://github.com/asjadnaqvi/stata-circlebar":circlebar v1.31 (GitHub)}}
+{right:{browse "https://github.com/asjadnaqvi/stata-circlebar":circlebar v1.4 (GitHub)}}
 
 {hline}
 
@@ -14,9 +14,10 @@
 
 {cmd:circlebar} {it:var} {ifin}, {cmd:by}({it:var1}) [ {cmd:stack}({it:var2}) ]
                 {cmd:[} {cmd:radmin}({it:num}) {cmd:radmax}({it:num}) {cmdab:circ:les}({it:num}) {cmd:gap}({it:num}) {cmd:alpha}({it:num}) {cmd:palette}({it:str}) {cmdab:nolab:els} {cmdab:rotatelab:el} {cmdab:showval:ues} 
-                  {cmdab:nocirc:les}  {cmdab:circt:op} {cmdab:noleg:end} {cmdab:ra:nge}({it:num}) {cmdab:nocirclab:els} {cmdab:circlabf:ormat}({it:str}) {cmdab:circlabs:ize}({it:str}) {cmdab:circlabc:olor}({it:str})
+                  {cmdab:nocirc:les}  {cmdab:circt:op} {cmdab:ra:nge}({it:num}) {cmdab:nocirclab:els} {cmdab:circlabf:ormat}({it:str}) {cmdab:circlabs:ize}({it:str}) {cmdab:circlabc:olor}({it:str})
                   {cmdab:labc:olor}({it:str}) {cmdab:ro:tate}({it:num}) {cmdab:lc:olor}({it:str}) {cmdab:lw:idth}({it:str}) {cmdab:circc:olor}({it:str}) {cmdab:circw:idth}({it:str})
-                  {cmdab:labg:ap}({it:num}) {cmdab:labs:ize}({it:str}) {cmdab:cf:ill}({it:str}) {cmdab:clc:olor}({it:str})  {cmdab:clw:idth}({it:str}) {cmd:points}({it:num})
+                  {cmdab:labg:ap}({it:num}) {cmdab:labs:ize}({it:str}) {cmdab:cf:ill}({it:str}) {cmdab:clc:olor}({it:str})  {cmdab:clw:idth}({it:str}) {cmd:points}({it:num}) 
+                  {cmdab:noleg:end} {cmd:rows}({it:num}) {cmdab:legs:ize}({it:str}) {cmdab:legpos:ition}({it:str})
                   {cmd:title}({it:str}) {cmd:subtitle}({it:str}) {cmd:note}({it:str}) {cmd:name}({it:str}) {cmd:saving}({it:str}) {cmd:graphregion}({it:str})		              		
                 {cmd:]}
 
@@ -86,7 +87,15 @@ This option is especially useful if a non-white background is used.{p_end}
 
 {p2coldent : {opt clw:idth(str)}}Line with of the center circle line. Default is {opt clw(0.2)}.{p_end}
 
-{p2coldent : {opt points(num)}}Advanced option for setting the number of points to generate the circles. Default is {opt points(500)} which works fine for general use.{p_end} 
+{p2coldent : {opt points(num)}}Advanced option for setting the number of points to generate the circles. Default is {opt points(500)} which works fine.{p_end} 
+
+{p2coldent : {opt noleg:end}}Turn off the legend.{p_end}
+
+{p2coldent : {opt rows(num)}}Number of legend rows. Default is {opt rows(3)}.{p_end}
+
+{p2coldent : {opt legs:ize(str)}}Size of legend entries. Default is {opt legs(2.2)}.{p_end}
+
+{p2coldent : {opt legpos:ition(str)}}Position of legend. Default is {opt legpos(6)} for 6 o' clock.{p_end}
 
 {p2coldent : {opt title()}, {opt subtitle()}, {opt note()}, {opt text()}}These are standard twoway graph options. {opt text} can be used to add text to the middle of the circles.{p_end}
 
@@ -114,20 +123,11 @@ See {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}.
 
 {hline}
 
-{title:Version history}
-
-- {bf:1.3} : Complete rework of the base routines. The program is much more stable now.	
-- {bf:1.21}: Fixed a major bug where the legend keys were wrong if {opt circtop} was specified.
-- {bf:1.2} : Fixed a major bug where the legend names where reversed. Other code improvements.
-- {bf:1.1} : Starting slice recentered to 12 o' clock position. Options {opt cfill()}, {opt labcolor()}, {opt rotate()} added. 
-- {bf:1.01}: Minor bug fixes.
-- {bf:1.0} : First version. Beta release.
-
 
 {title:Package details}
 
-Version      : {bf:circlebar} v1.31
-This release : 02 Feb 2024
+Version      : {bf:circlebar} v1.4
+This release : 03 Feb 2024
 First release: 18 Nov 2022
 Repository   : {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}
 Keywords     : Stata, circle bar graphs
