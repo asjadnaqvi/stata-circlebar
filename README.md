@@ -12,7 +12,7 @@
 # circlebar v1.31
 (02 Feb 2024)
 
-This package allows us to draw bar graphs in Stata organized in polar coordinates.
+A package for polar bar graphs in Stata.
 
 
 ## Installation
