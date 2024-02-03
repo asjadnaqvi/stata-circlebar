@@ -19,7 +19,7 @@ A package for polar bar graphs in Stata.
 
 The package can be installed via SSC or GitHub. The GitHub version, *might* be more recent due to bug fixes, feature updates etc, and *may* contain syntax improvements and changes in *default* values. See version numbers below. Eventually the GitHub version is published on SSC.
 
-SSC (**v1.3**):
+SSC (**v1.31**):
 
 ```
 ssc install circlebar, replace
