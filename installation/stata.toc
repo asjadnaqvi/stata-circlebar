@@ -1,9 +1,10 @@
-v 1.31
+v 1.5
 d 'CIRCLEBAR': A Stata package for polar bar graphs
-d Distribution-Date: 20240202
+d Distribution-Date: 20240428
 d Asjad Naqvi
 d asjadnaqvi@gmail.com
 d https://medium.com/the-stata-guide
+p polarbar
 p circlebar
 
 

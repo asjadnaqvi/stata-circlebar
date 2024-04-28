@@ -1,6 +1,3 @@
-
-![circlebar-1](https://github.com/asjadnaqvi/stata-circlebar/assets/38498046/1c9420e0-d824-4918-b3c3-28a3bc83abf3)
-
 ![StataMin](https://img.shields.io/badge/stata-2015-blue) ![issues](https://img.shields.io/github/issues/asjadnaqvi/stata-circlebar) ![license](https://img.shields.io/github/license/asjadnaqvi/stata-circlebar) ![Stars](https://img.shields.io/github/stars/asjadnaqvi/stata-circlebar) ![version](https://img.shields.io/github/v/release/asjadnaqvi/stata-circlebar) ![release](https://img.shields.io/github/release-date/asjadnaqvi/stata-circlebar)
 
 ---
@@ -9,8 +6,13 @@
 
 ---
 
-# circlebar v1.4
-(03 Feb 2024) - work in progress
+![circlebar-1](https://github.com/asjadnaqvi/stata-circlebar/assets/38498046/1c9420e0-d824-4918-b3c3-28a3bc83abf3)
+
+
+
+
+# circlebar/polarbar v1.5
+(28 Apr 2024)
 
 A package for polar bar graphs in Stata.
 
@@ -25,7 +27,7 @@ SSC (**v1.31**):
 ssc install circlebar, replace
 ```
 
-GitHub (**v1.4**):
+GitHub (**v1.5**):
 
 ```
 net install circlebar, from("https://raw.githubusercontent.com/asjadnaqvi/stata-circlebar/main/installation/") replace
@@ -65,8 +67,7 @@ circlebar var [if] [in], by(var1) [ stack(var2) ]
                   nocircles  circtop range(num) nocirclabels circlabformat(str) circlabsize(str) circlabcolor(str)
                   labcolor(str) rotate(num) lcolor(str) lwidth(str) circcolor(str) circwidth(str)
                   labgap(num) labsize(str) cfill(str) clcolor(str)  clwidth(str) points(num) 
-                  nolegend rows(num) legsize(str) legposition(str)
-                  title(str) subtitle(str) note(str) name(str) saving(str) graphregion(str)                                   
+                  nolegend legsize(str) legposition(str) rows(num) half sort *
                 ]
 ```
 
@@ -231,6 +232,26 @@ circlebar y_TOT if NUTS0=="IT", radmin(0) gap(0) by(NUTS1) stack(NUTS2)
 
 
 
+### half circles (v1.5)
+
+The command now produces semi circle bar graphs. Note that the `aspect()` option might be needed to adjust the dimensions. Default for `half` is `aspect(0.5)`.
+
+```
+circlebar y_TOT if NUTS0=="IT", by(NUTS1) stack(NUTS2) half aspect(0.35)
+```
+
+<img src="/figures/circlebar14.png" width="100%">
+
+
+### sorted bars (v1.5)
+
+```
+circlebar y_TOT if NUTS0=="DE", by(NUTS1) sort 
+```
+
+<img src="/figures/circlebar15.png" width="100%">
+
+
 ## Feedback
 
 Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to report errors, feature enhancements, and/or other requests. 
@@ -238,8 +259,16 @@ Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to 
 
 ## Change log
 
-**v1.4  (03 Feb 2024)**
+**v1.5 (28 Apr 2024)**
+- Added `half` option.
+- Added `sort` option.
+- Better passthru options.
+- Several bug fixes and redundant code taken out.
+
+**v1.4 (03 Feb 2024)**
 - Better legend options.
+- Restructuring of base code for later updates.
+- Code cleanups
 
 **v1.31 (02 Feb 2024) HOTFIX!**
 - Fixed the label bug which was off by one slice.

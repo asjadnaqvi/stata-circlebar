@@ -1,17 +1,18 @@
-v 1.31
-d {bf:CIRCLEBAR}: A Stata package for circular bar graphs
-d See {bf:help circlebar} after installation.
+v 1.5
+d {bf:POLARBAR}: A Stata package for polar bar graphs
+d See {bf:help polarbar} after installation.
 d
 d Requires: Stata version 15 or higher.
 d
 d KW: Stata
 d KW: graphs
 d KW: circlar bar graph
+d KW: polar bar graph
 d
 d
-d Distribution-Date: 20240202
+d Distribution-Date: 20240428
 d
-d This  version: 02 Feb 2024
+d This  version: 28 Apr 2024
 d First version: 18 Nov 2022
 d License: MIT
 d
@@ -19,6 +20,8 @@ d Author: Asjad Naqvi (asjadnaqvi@gmail.com)
 d
 f circlebar.ado
 f circlebar.sthlp
+f polarbar.ado
+f polarbar.sthlp
 
 
 

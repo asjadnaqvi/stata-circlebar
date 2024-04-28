@@ -1,6 +1,7 @@
-*! circlebar v1.4 (02 Feb 2024)
+*! polarbar/circlebar v1.5 (28 Apr 2024)
 *! Asjad Naqvi (asjadnaqvi@gmail.com)
 
+* v1.5	(28 Apr 2024): Better passthru options. Many bug fixes. Added half. Added sort.
 * v1.4  (03 Feb 2024): better legend options added. other code cleanup. 
 * v1.31	(02 Feb 2024): labels need to be rotated by one. Added ability to sort by height
 * v1.3	(22 Jan 2024): rewrite of base routines, major code clean, support for unbalanced panels
@@ -27,12 +28,11 @@ version 15
 		[ NOLABels ROTATELABel SHOWVALues LColor(string) LWidth(string) palette(string) NOLEGend	    		] ///
 		[ NOCIRCles CIRCles(real 5) RAnge(numlist min=1 max=1) CIRCColor(string) CIRCWidth(string) CIRCTop		] ///
 		[ NOCIRCLABels CIRCLABFormat(string) CIRCLABSize(string) CIRCLABColor(string)  		]   ///
-		[ LABGap(real 5) LABSize(string) 					]	///
-		[ title(passthru) subtitle(passthru) note(passthru)	]	///
-		[ scheme(passthru) name(passthru) text(passthru) saving(passthru) graphregion(passthru) 	]   ///
-		[ LABColor(string) ROtate(real 0) ] ///   // v1.1 options
+		[ LABGap(real 5) LABSize(string) legend(passthru)	]	///
+		[ LABColor(string) ROtate(real 0) 					] 	///   // v1.1 options
 		[ CFill(string) CLColor(string) CLWidth(string)	points(real 500)   ]	///		// v1.3 options
-		[ rows(real 3) LEGSize(string) LEGPOSition(string) half sort ]   // v1.4 options. last two are currently undocumented
+		[ rows(real 3) LEGSize(string) LEGPOSition(string) half sort 	   ]  /// // v1.4 options. last two are currently undocumented
+		[ * aspect(real 1) xsize(real 1) ysize(real 1) ]		// v1.5 options
 		
 	// check dependencies
 	capture findfile colorpalette.ado
@@ -80,10 +80,10 @@ preserve
 	if "`stack'" == "" {
 		gen ov = 1
 		local stack ov
-		
 		local ovrclr = 1
-	
 	}
+	
+	
 	
 	
 	
@@ -128,6 +128,20 @@ preserve
 
 	
 	
+	if "`sort'" != "" {		// optimize this part
+		bysort `by': egen _count = sum(`varlist')
+		gsort -_count `by'
+		egen _tag = tag(_count `by')
+		gen _rank = sum(_tag)
+		decode by2, gen(_temp2)
+		labmask _rank, val(_temp2)
+		drop _count _tag _temp2 
+		drop by2
+		local by _rank
+		
+	}	
+	
+
 
 	// preserve the labels of the by variable
 	levelsof `by', local(idlabels)      // store the id levels
@@ -139,7 +153,11 @@ preserve
 
 	collapse (sum) `varlist', by(`by' `stack')
 	
-					
+
+	
+	
+	
+	
 	bysort `by' (`stack'): gen double stackvar = sum(`varlist')				
 
 	
@@ -172,7 +190,7 @@ preserve
 	
 	local 2pi = 2
 
-	if "`half'"!= "" local 2pi -1
+	if "`half'"!= "" local 2pi = -1
 	
 	*** rescale radius to (a,b) = ((b - a)(x - xmin)/(xmax - xmin)) + a	
 	replace radius = ((`radmax' - `radmin') * (radius - 0) / (1 - 0)) + `radmin'
@@ -185,32 +203,23 @@ preserve
 	gen double y =  radius * sin(angle) 		
 	
 	drop theta
-	
-	 
 	local items = _N
 	
 	sum `by', meanonly
 	local maxval = r(max) + 1
 	
-	
 	expand 2 if `by'==1 
 
-	
 	replace `by' = `maxval' if _n > `items'	
 	sort `stack' `by'
 	
-	
 	gen dummy = `varlist' == 0
-	
 	drop `varlist' stackvar
-	
 
 	gen id = 1
-	
-	
+
 	reshape wide x y radius angle dummy, i(id `stack') j(`by')				
 
-	
 	expand 3		
 	sort `stack'
 	bysort `stack' : gen serial = _n
@@ -231,7 +240,7 @@ preserve
 		recode x`i' (.=0) if serial==3  // for division with zero
 		recode y`i' (.=0) if serial==3
 		
-		}			
+	}			
 		
 	
 	
@@ -248,10 +257,8 @@ preserve
 	local obsnew = _N + 97 * lvls
 	set obs  `obsnew'		// points for the arc. more points = smoother arc but slower
 
-	
 
 	forval i = 1 / `=scalar(lvls)' {
-		
 		local start = `lastobs' + 1
 		local end   = `start'   + 96
 		replace `stack' = `i' in `start'/`end'
@@ -287,24 +294,19 @@ preserve
 		
 		// arc start and end angles		
 			
-			summ angle`i', meanonly
-			local end = r(max) + `ro'
+		summ angle`i', meanonly
+		local end = r(max) + `ro'
+		local cuts = (`end' - `start') / 99
 	
-			local cuts = (`end' - `start') / 99
-	
-			replace angle`i'_new =  `start' + `cuts' * (counter - 2) if x1!=0
-			replace x`i'_new	 = radius`i' * cos(angle`i'_new)
-			replace y`i'_new	 = radius`i' * sin(angle`i'_new)			
+		replace angle`i'_new =  `start' + `cuts' * (counter - 2) if x1!=0
+		replace x`i'_new	 = radius`i' * cos(angle`i'_new)
+		replace y`i'_new	 = radius`i' * sin(angle`i'_new)			
 			
-			local start = `end' - 2 * `ro'
+		local start = `end' - 2 * `ro'
 	}	
 	
-		
-	
-		
-	////////////////////////
-	// replace and rotate //
-	////////////////////////
+
+	// replace and rotate 
 	
 		forval i = 1/`=scalar(obs)' {  // 
 			replace x`i' = x`i'_new * cos(`rotate' * _pi / 180) - y`i'_new * sin(`rotate' * _pi / 180) if !missing(x`i'_new)
@@ -330,8 +332,6 @@ preserve
 	  
 		local aend = `x'
 	  
-		di "`astart' - `aend'"
-	  
 		gen double xlab`x' =  `labmax' * cos((angle`astart' + angle`aend') /2) in 1
 		gen double ylab`x' =  `labmax' * sin((angle`astart' + angle`aend') /2) in 1 
 		
@@ -350,16 +350,16 @@ preserve
 
 	cap drop lab*
    
-		forval i = 1/`=scalar(obs)' {
+	forval i = 1/`=scalar(obs)' {
 			
-			if "`idlab_`i''" != "" {
-				gen lab`i' = "`idlab_`i''" in 1	
-			}
-			else {
-				gen lab`i' = `i' in 1
-			}
+		if "`idlab_`i''" != "" {
+			gen lab`i' = "`idlab_`i''" in 1	
+		}
+		else {
+			gen lab`i' = `i' in 1
+		}
 			
-		}	
+	}	
 		
 	///////////////////////
 	//   circle labels   //
@@ -418,8 +418,6 @@ preserve
 		} 
 	}
 	
-
-	
 	
 	/////////////////
 	//   circles   //
@@ -432,13 +430,12 @@ preserve
 	
 		if "`circcolor'" == "" local circcolor gs10
 		if "`circwidth'" == "" local circwidth 0.1
+	}
 	
-	// local sides = cond("`polygon'" == "",  300, `items')   // deal with later
-	
+
 	
 	local gap = (`radmax' - `radmin') / (`circles' - 1)
 	
-		
 	if `gap' > _N {
 		local newobs = `gap' + 1
 		set obs `newobs'
@@ -446,16 +443,11 @@ preserve
 	
 	
 	forval x = `radmin'(`gap')`radmax' {	
+		local rings `rings' (function  sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`points'))
 		
 		if "`half'" == "" {
-			local rings `rings' (function sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`points')) || (function -sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x')  n(`points')) ||
-		}
-		else {
-			local rings `rings' (function sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`points'))
-		}
-		
+			local rings `rings' (function -sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`points'))
 		}		
-	
 	}
 	
 
@@ -489,26 +481,17 @@ preserve
 	
 		forval i = 1/`=scalar(lvls)' {
 		
-		local rev = `=scalar(lvls)' - `i' + 1
-		
-		local t : label `stack' `rev' 
-		
-		
-		local shift = 0  // legend shift
-		if "`circtop'" == "" local shift = (`circles' * 2)	
-				
-		local k = `i' + ((`=scalar(obs)' - 1) * `j' ) + `shift'
-		
-			
-		local entries `" `entries' `k'  "`t'"  "'
-		
-		local j = `j' + 1
-		
+			local rev = `=scalar(lvls)' - `i' + 1
+			local t : label `stack' `rev' 
+			local shift = 0  // legend shift
+			if "`circtop'" == "" local shift = (`circles' * 2)	
+			local k = `i' + ((`=scalar(obs)' - 1) * `j' ) + `shift'
+			local entries `" `entries' `k'  "`t'"  "'
+			local ++j
 		}
 	
-		*local rows = floor(lvls/`rows') + 1 
 		
-		local legend legend(order("`entries'") pos(`legposition') size(`legsize') row(`rows')) 
+		local legend legend(order("`entries'") pos(`legposition') size(`legsize') rows(`rows')) 
 	
 	}
 	else {
@@ -576,6 +559,15 @@ preserve
 		if "`half'"=="" local fill `fill'   (function  -sqrt(`radmin'^2 - (x)^2), lw(`clwidth') lc(`clcolor') range(-`radmin' `radmin'))  //	lc bot	
 	
 	
+	local ymin = -`radmax'
+	
+		if "`half'"!="" {
+			local aspect 0.5
+			local xsize 2
+			local ymin = 0
+		}
+		
+	
 	local ysize 1
 	local xsize 1
 
@@ -584,7 +576,9 @@ preserve
 		local xsize 2
 	}
 	
-	// final graph
+	
+	
+	**** final graph  
 		
     twoway				///
 		`rings'			///
@@ -594,11 +588,11 @@ preserve
 			`circlabs'  ///		
 			`labs'		///							
 				, 		///
-					xsize(`xsize') ysize(`ysize') aspect(1)  /// 
+					xsize(`xsize') ysize(`ysize') aspect(`aspect')  /// 
 					xscale(off) yscale(off) ///
 					xlabel(-`radmax' `radmax', nogrid) ///
-					ylabel(-`radmax' `radmax', nogrid) ///		
-					`legend' `title' `note' `subtitle' `text' `scheme' `name' `saving'
+					ylabel( `ymin' 	 `radmax', nogrid) ///		
+					`legend' `options'
 						
 */
 restore			
