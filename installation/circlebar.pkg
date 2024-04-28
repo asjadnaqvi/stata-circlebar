@@ -1,6 +1,6 @@
 v 1.5
-d {bf:POLARBAR}: A Stata package for polar bar graphs
-d See {bf:help polarbar} after installation.
+d {bf:CIRCLEBAR}: A Stata package for polar bar graphs
+d See {bf:help circlebar} after installation.
 d
 d Requires: Stata version 15 or higher.
 d
