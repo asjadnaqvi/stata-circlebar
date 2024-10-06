@@ -306,8 +306,8 @@ Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to 
 - Added `showtotal`.
 - Added `stat()` where options `stat(mean)` (default) and `stat(sum)` can be defined.
 - Added option `labnear` to show labels right above bars.
-- Added option `labvar` to allow users to custom define a label.
-- Added option `colorvar` to allow users to define a custom color variable.
+- Added option `labvar()` to allow users to custom define a label.
+- Added option `colorvar()` to allow users to define a custom color variable.
 - Added options `rline()`, `rlinecolor()`, `rlinepattern()`, and `rlinewidth()` where users can define a custom reference line. Similar to `xline()` and `yline()` in standard twoway graphs.
 - Several defaults updated.
 - Lots of code fixes.
