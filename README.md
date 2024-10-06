@@ -12,7 +12,7 @@
 
 
 # circlebar/polarbar v1.6
-(28 Apr 2024)
+(05 Oct 2024)
 
 A package for polar bar graphs in Stata. Note that both `circlebar` and `polarbar` are substituable commands.
 
