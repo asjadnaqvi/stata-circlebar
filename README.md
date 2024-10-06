@@ -11,10 +11,10 @@
 
 
 
-# circlebar/polarbar v1.5
+# circlebar/polarbar v1.6
 (28 Apr 2024)
 
-A package for polar bar graphs in Stata.
+A package for polar bar graphs in Stata. Note that both `circlebar` and `polarbar` are substituable commands.
 
 
 ## Installation
@@ -27,7 +27,7 @@ SSC (**v1.5**):
 ssc install circlebar, replace
 ```
 
-GitHub (**v1.5**):
+GitHub (**v1.6**):
 
 ```
 net install circlebar, from("https://raw.githubusercontent.com/asjadnaqvi/stata-circlebar/main/installation/") replace
@@ -62,13 +62,15 @@ graph set window fontface "Arial Narrow"
 The syntax for the latest version is as follows:
 
 ```stata
-circlebar var [if] [in], by(var1) [ stack(var2) ]
-                [ radmin(num) radmax(num) circles(num) gap(num) alpha(num) palette(str) nolabels rotatelabel showvalues 
-                  nocircles  circtop range(num) nocirclabels circlabformat(str) circlabsize(str) circlabcolor(str)
+circlebar var [if] [in] [weight], by(var1) [ stack(var2) ]
+                [ radmin(num) radmax(num) circles(num) gap(num) alpha(num) palette(str) colorvariable(var) 
+                  half sort showtotal labnear labvariable(var) nolabels rotatelabel stat(mean|sum)
+                  nocircles circtop range(num) nocirclabels circlabformat(str) circlabsize(str) circlabcolor(str)
                   labcolor(str) rotate(num) lcolor(str) lwidth(str) circcolor(str) circwidth(str)
-                  labgap(num) labsize(str) cfill(str) clcolor(str)  clwidth(str) points(num) 
-                  nolegend legsize(str) legposition(str) rows(num) half sort *
-                ]
+                  labgap(num) labsize(str) cfill(str) clcolor(str)  clwidth(str) points(num) showvalues 
+                  nolegend legsize(str) legposition(str) rows(num) 
+                  rline(num) rlinecolor(str) rlinewidth(str) rlinepattern(str) * ]
+
 ```
 
 See the help file `help circlebar` for details.
@@ -147,6 +149,46 @@ circlebar deathspm, by(month) gap(2) palette(CET C6) rotatelab
 ```
 
 <img src="/figures/circlebar6.png" width="100%">
+
+
+
+### new options in v1.6
+
+```
+circlebar deathspm, by(month) palette(CET C6) rotatelab showtotal format(%8.0fc) labgap(15)
+```
+
+<img src="/figures/circlebar6_1.png" width="100%">
+
+
+```
+circlebar deathspm, by(month) palette(CET C6) rotatelab showtotal format(%8.0fc) labgap(15) sort
+```
+
+<img src="/figures/circlebar6_2.png" width="100%">
+
+```
+circlebar deathspm, by(month) palette(CET C6) rotatelab showtotal format(%8.0fc) labgap(15) sort labnear
+```
+
+<img src="/figures/circlebar6_3.png" width="100%">
+
+```
+circlebar deathspm, by(month) palette(CET C6) rotatelab showtotal format(%8.0fc) labgap(15) sort labnear /// 
+range(20000) circles(5)  circlabformat(%9.0fc)
+```
+
+<img src="/figures/circlebar6_4.png" width="100%">
+
+```
+circlebar deathspm, by(month) palette(CET C6) rotatelab showtotal format(%8.0fc) labgap(15) sort labnear ///
+range(20000) circles(5)  circlabformat(%9.0fc) circlabc(black) circc(gs14) rline(4000) 
+```
+
+<img src="/figures/circlebar6_5.png" width="100%">
+
+
+### stacked bars
 
 ```
 circlebar deathspm, by(month) stack(continent) gap(2) palette(CET C6) rotatelab
@@ -259,6 +301,17 @@ Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to 
 
 ## Change log
 
+**v1.6 (05 Oct 2024)**
+- Weights are now allowed.
+- Added `showtotal`.
+- Added `stat()` where options `stat(mean)` (default) and `stat(sum)` can be defined.
+- Added option `labnear` to show labels right above bars.
+- Added option `labvar` to allow users to custom define a label.
+- Added option `colorvar` to allow users to define a custom color variable.
+- Added options `rline()`, `rlinecolor()`, `rlinepattern()`, and `rlinewidth()` where users can define a custom reference line. Similar to `xline()` and `yline()` in standard twoway graphs.
+- Several defaults updated.
+- Lots of code fixes.
+
 **v1.5 (28 Apr 2024)**
 - Added `half` option.
 - Added `sort` option.
@@ -268,7 +321,7 @@ Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to 
 **v1.4 (03 Feb 2024)**
 - Better legend options.
 - Restructuring of base code for later updates.
-- Code cleanups
+- Code cleanup.
 
 **v1.31 (02 Feb 2024) HOTFIX!**
 - Fixed the label bug which was off by one slice.

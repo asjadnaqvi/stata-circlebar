@@ -1,6 +1,7 @@
-*! polarbar/circlebar v1.5 (28 Apr 2024)
+*! circlebar/polarbar v1.6 (05 Oct 2024)
 *! Asjad Naqvi (asjadnaqvi@gmail.com)
 
+* v1.6  (05 Oct 2024): added showtotal, stat(), format(), labnear, labvar(), colorvar() rline(), rclinec(), rlinep(), circlabpos()	
 * v1.5	(28 Apr 2024): Better passthru options. Many bug fixes. Added half. Added sort.
 * v1.4  (03 Feb 2024): better legend options added. other code cleanup. 
 * v1.31	(02 Feb 2024): labels need to be rotated by one. Added ability to sort by height
@@ -23,16 +24,18 @@ program circlebar, sortpreserve
 
 version 15
  
-	syntax varlist(min=1 max=1 numeric) [if] [in], by(varname) 													  ///
+	syntax varlist(min=1 max=1 numeric) [if] [in] [aw fw pw iw/], by(varname) 									  ///
 		[ stack(varname) radmin(real 4) radmax(real 10) gap(real 0) alpha(real 100)								] ///
-		[ NOLABels ROTATELABel SHOWVALues LColor(string) LWidth(string) palette(string) NOLEGend	    		] ///
+		[ NOLABel ROTATELABel SHOWVALues LColor(string) LWidth(string) palette(string) NOLEGend	    			] ///
 		[ NOCIRCles CIRCles(real 5) RAnge(numlist min=1 max=1) CIRCColor(string) CIRCWidth(string) CIRCTop		] ///
-		[ NOCIRCLABels CIRCLABFormat(string) CIRCLABSize(string) CIRCLABColor(string)  		]   ///
-		[ LABGap(real 5) LABSize(string) legend(passthru)	]	///
-		[ LABColor(string) ROtate(real 0) 					] 	///   // v1.1 options
-		[ CFill(string) CLColor(string) CLWidth(string)	points(real 500)   ]	///		// v1.3 options
-		[ rows(real 3) LEGSize(string) LEGPOSition(string) half sort 	   ]  /// // v1.4 options. last two are currently undocumented
-		[ * aspect(real 1) xsize(real 1) ysize(real 1) ]		// v1.5 options
+		[ NOCIRCLABels CIRCLABFormat(string) CIRCLABSize(string) CIRCLABColor(string)  							] ///
+		[ LABGap(real 10) LABSize(string) legend(passthru)														] ///
+		[ LABColor(string) ROtate(real 0) 																		] ///   // v1.1 options
+		[ CFill(string) CLColor(string) CLWidth(string)	points(numlist max=1 >100) 								] ///	// v1.3 options
+		[ rows(real 3) LEGSize(string) LEGPOSition(string) half sort 	   										] ///   // v1.4 options
+		[ * aspect(real 1) xsize(real 1) ysize(real 1) 															] ///	// v1.5 options
+		[ SHOWTOTal stat(string) format(string) labnear LABVARiable(varlist max=1 string) COLORVARiable(varlist max=1 numeric) ] /// // v1.6
+		[ rline(numlist max=1) RLINEColor(string) RLINEWidth(string) RLINEPattern(string)   ] 										 // v1.6
 		
 	// check dependencies
 	capture findfile colorpalette.ado
@@ -47,29 +50,34 @@ version 15
 		exit 
 	}
 
+	if "`stat'" != "" & !inlist("`stat'", "mean", "sum") {
+		display as error "Valid options are {bf:stat(mean)} or {bf:stat(sum) [default]}."
+		exit
+	}	
+	
+	
 	if "`radmin'" == "0" local radmin 0.01 // to avoid irregular outputs...
 
 	cap findfile carryforward.ado
-	if _rc != 0 {
-		qui ssc install carryforward, replace
-	}	
+	if _rc != 0 quietly ssc install carryforward, replace
+	
 	
 	capture findfile labmask.ado
-	if _rc != 0 {
-		qui ssc install labutil, replace
-	}	
+	if _rc != 0 quietly ssc install labutil, replace
 	
 	marksample touse, strok
 	
-qui {	
+quietly {	
 preserve	
-
 	
 	keep if `touse'
-	keep `varlist' `by' `stack'  
+	drop if missing(`varlist')
+	
+	keep `varlist' `by' `stack' `labvariable' `colorvariable' `exp'
+	
 	
 	if "`stack'" != "" {
-		fillin `by' `stack' // tiangularize
+		fillin `by' `stack'  // tiangularize
 		recode `varlist' (.=0)
 	}
 	
@@ -82,9 +90,6 @@ preserve
 		local stack ov
 		local ovrclr = 1
 	}
-	
-	
-	
 	
 	
 	// finetune the stack variable
@@ -123,9 +128,29 @@ preserve
 			decode `by', gen(`tempov')		
 			labmask by2, val(`tempov')
 		}
+		else {
+			labmask by2, val(`by')
+		}
+		
 		local by by2 
 	}			
 
+	
+	if "`stat'" 	== "" local stat sum
+	if "`weight'" 	!= "" local myweight  [`weight' = `exp']	
+
+	
+	if "`labvariable'" != "" 	local keeplabvar (first) `labvariable'
+	
+	if "`colorvariable'" != ""  {
+		egen _clrgrp = group(`colorvariable')
+		drop `colorvariable'
+		local colorvariable _clrgrp
+		
+		local keepclrvar (first) `colorvariable'
+	}
+	
+	collapse (`stat') `varlist' `keeplabvar' `keepclrvar' `myweight' , by(`by' `stack')
 	
 	
 	if "`sort'" != "" {		// optimize this part
@@ -139,28 +164,23 @@ preserve
 		drop by2
 		local by _rank
 		
-	}	
+	}		
+
 	
-
-
-	// preserve the labels of the by variable
-	levelsof `by', local(idlabels)      // store the id levels
+	// preserve the labels and values
+	levelsof `by', local(idlabels)   
  
 	foreach x of local idlabels {       
 		local idlab_`x' : label `by' `x'  
+		
+		summ `varlist' if `by'==`x', meanonly
+		local idval_`x' = r(sum)
 	}	
-	
-
-	collapse (sum) `varlist', by(`by' `stack')
-	
-
-	
-	
-	
+		
 	
 	bysort `by' (`stack'): gen double stackvar = sum(`varlist')				
 
-	
+
 	summ stackvar, meanonly
 	local maxval = r(max) // the maximum value of the height
 				
@@ -217,8 +237,8 @@ preserve
 	drop `varlist' stackvar
 
 	gen id = 1
+	reshape wide x y radius angle dummy `labvariable' `colorvariable', i(id `stack' ) j(`by')				
 
-	reshape wide x y radius angle dummy, i(id `stack') j(`by')				
 
 	expand 3		
 	sort `stack'
@@ -259,11 +279,11 @@ preserve
 
 
 	forval i = 1 / `=scalar(lvls)' {
-		local start = `lastobs' + 1
-		local end   = `start'   + 96
+		local start 	= `lastobs' + 1
+		local end   	= `start'   + 96
 		replace `stack' = `i' in `start'/`end'
 		
-		local lastobs = `end'
+		local lastobs 	= `end'
 		
 	}
 	
@@ -283,7 +303,7 @@ preserve
 		
 	levelsof stack2, local(lvls)
 	
-	local ro = (`gap' / 2) * _pi / 180 
+	local ro 	= (`gap' / 2) * _pi / 180 
 	local start = 0 - `ro'
 
 	forval i = 1/`=scalar(obs)' {  // 
@@ -316,51 +336,74 @@ preserve
 
 	drop *new
 	
+	if "`format'" == "" local format "%8.1f"
+	
 
 	**********************	
 	// add pie labels	//
 	**********************
+		
+	gen double _x = .
+	gen double _y = .
+	gen double _angle = .
+	gen double _value = .
+	gen double _radius = .
+	gen _color = .
 	
-	cap drop xlab* ylab*
+	gen _lab = ""
 	
 	gen angle0 = 0 in 1
-	local astart = 0
 	
 	forval x = 1/`=scalar(obs)' {
 	 
-		local labmax =  `radmax' * (1 + `labgap' / 100) //  push out the labels 
-	  
-		local aend = `x'
-	  
-		gen double xlab`x' =  `labmax' * cos((angle`astart' + angle`aend') /2) in 1
-		gen double ylab`x' =  `labmax' * sin((angle`astart' + angle`aend') /2) in 1 
+		local y = `x' - 1
+	 
+		replace _radius = radius`x'[1]  in `x'
 		
-		gen double  ang`x' =  .
-		replace ang`x' = (angle`astart' + angle`aend') / 2 * (180 / _pi) + 180 in 1 if xlab`x' <= 0
-		replace ang`x' = (angle`astart' + angle`aend') / 2 * (180 / _pi)       in 1 if xlab`x' > 0
+		local mygap = `radmax' * `labgap' / 100 // fix the gaps
+			 
+		if "`labnear'" != "" {
+			summ radius`x', meanonly
+			replace _radius =  `r(max)' + `mygap' in `x'
+		}
+		else {
+			replace _radius =  `radmax' + `mygap' in `x' 
+		}
+	  
+		replace _x 		=  _radius * cos((angle`y'[1] + angle`x'[1]) /2) in `x'
+		replace _y 		=  _radius * sin((angle`y'[1] + angle`x'[1]) /2) in `x' 
+
+		replace _value 	= `idval_`x'' in `x'
+
+		replace _angle 	= (angle`y'[1] + angle`x'[1]) / 2 * (180 / _pi) + 180 in `x' if _x <= 0
+		replace _angle 	= (angle`y'[1] + angle`x'[1]) / 2 * (180 / _pi)       in `x' if _x > 0
 		
-		*replace ang`x' = ang`x' - 360 if ang`x' > 360
-	  
-	  
-		local astart = `aend'
-	  
+		if "`colorvariable'" != "" {
+			replace _color = `colorvariable'`x'[1] in `x'
+		}
+		else {
+			replace _color = `x' in `x'
+		}
+		
+		
+		if "`labvariable'" != "" {
+				replace _lab = `labvariable'`x'[1] in `x'
+		}
+		else {
+			if "`showtotal'" != "" {
+				replace _lab = "`idlab_`x''" + " (" + string(_value, "`format'") + ")" in `x'
+			}
+			else {
+				replace _lab = "`idlab_`x''" in `x'
+			}
+		}
 	}
 	  
 	drop angle0
 
-	cap drop lab*
-   
-	forval i = 1/`=scalar(obs)' {
-			
-		if "`idlab_`i''" != "" {
-			gen lab`i' = "`idlab_`i''" in 1	
-		}
-		else {
-			gen lab`i' = `i' in 1
-		}
-			
-	}	
-		
+	
+	
+	
 	///////////////////////
 	//   circle labels   //
 	///////////////////////			
@@ -379,6 +422,7 @@ preserve
 	gen yvar = .
 	gen xlab = ""
 
+	
 	local i = 1
 
 	forval x = `radmin'(`gap')`radmax' {
@@ -389,11 +433,32 @@ preserve
 		local i = `i' + 1 
 	}	
 		
+
 			
 	*****************
 	***    draw   ***
 	*****************
 	
+	///////////////////////
+	//   ring line		 //
+	///////////////////////
+	
+	if "`rline'" != "" {	
+		
+		if "`rlinecolor'" == "" local rlinecolor black
+		if "`rlinewidth'" == "" local rlinewidth 0.15
+		if "`rlinepattern'" == "" local rlinepattern solid
+		
+		local rline = ((`radmax' - `radmin') * `rline' / `rhi') + `radmin'		
+
+		
+			local ringline 				(function  sqrt(`rline'^2 - x^2), lc(`rlinecolor') lw(`rlinewidth') lp(`rlinepattern') range(-`rline' `rline'))
+			
+		if "`half'" == "" {
+			local ringline `ringline' 	(function -sqrt(`rline'^2 - x^2), lc(`rlinecolor') lw(`rlinewidth') lp(`rlinepattern') range(-`rline' `rline'))
+		}		
+
+	}		
 	
 	
 	/////////////////
@@ -405,17 +470,18 @@ preserve
 	if "`labsize'" == "" local labsize 2
 	
 	if "`nolabel'" == "" {
-		forval i = 1/`=scalar(obs)' {
-
-			local j = `i' + 1	
-			if "`rotatelabel'" != "" {
-				summ ang`i', meanonly
+		
+		if "`rotatelabel'" != "" {
+			forval i = 1/`=scalar(obs)' {
+				summ _angle in `i', meanonly
 				local angle = r(mean) 
-			}
-		 
-			local labs `labs' (scatter ylab`i' xlab`i', mc(none) mlabel(lab`i') mlabpos(0) mlabcolor(`labcolor') mlabangle(`angle')  mlabsize(`labsize'))  ///  // 
-		  
-		} 
+				
+				local labs `labs' (scatter _y _x in `i', mc(none) mlabel(_lab) mlabpos(0) mlabcolor(`labcolor') mlabangle(`angle')  mlabsize(`labsize'))  
+			} 
+		}
+		else {
+			local labs `labs' (scatter _y _x, mc(none) mlabel(_lab) mlabpos(0) mlabcolor(`labcolor') mlabsize(`labsize'))  	
+		}
 	}
 	
 	
@@ -426,35 +492,35 @@ preserve
 
 	local rings
 	
-	if "`nocircle'" == "" {	
-	
+	if "`nocircles'" == "" {	
+		
 		if "`circcolor'" == "" local circcolor gs10
 		if "`circwidth'" == "" local circwidth 0.1
-	}
-	
 
-	
-	local gap = (`radmax' - `radmin') / (`circles' - 1)
-	
-	if `gap' > _N {
-		local newobs = `gap' + 1
-		set obs `newobs'
-	}
-	
-	
-	forval x = `radmin'(`gap')`radmax' {	
-		local rings `rings' (function  sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`points'))
+		local gap = (`radmax' - `radmin') / (`circles' - 1)
 		
-		if "`half'" == "" {
-			local rings `rings' (function -sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`points'))
-		}		
+		if `gap' > _N {
+			local newobs = `gap' + 1
+			set obs `newobs'
+		}
+		
+
+		forval x = `radmin'(`gap')`radmax' {	
+			    local rings `rings' (function  sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`points'))
+			
+			if "`half'" == "" {
+				local rings `rings' (function -sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`points'))
+			}		
+		}
+		
+
+		if "`circtop'" != "" {
+			local rings2 `rings'
+			local rings
+		}
+	
 	}
 	
-
-	if "`circtop'" != "" {
-		local rings2 `rings'
-		local rings
-	}
 	
 
 	///////////////////////
@@ -463,42 +529,42 @@ preserve
 	
 	if "`nocirclabels'" == "" {
 		local circlabs (scatter yvar xvar, mc(none) mlab(xlab) mlabpos(0) mlabcolor(`circlabcolor') mlabsize(`circlabsize'))  
-		
 	}
 	
-	
+
+
 	/////////////////
 	//   legend    //
 	/////////////////
+	
+	
+
 	
 	
 	if "`legsize'" 		== "" local legsize 2.2
 	if "`legposition'" 	== "" local legposition 6
 	
 	if "`nolegend'" == "" & `ovrclr' == 0 {
-	
-		local j = 0
+		local j = lvls - 1
 	
 		forval i = 1/`=scalar(lvls)' {
 		
-			local rev = `=scalar(lvls)' - `i' + 1
-			local t : label `stack' `rev' 
+			local rev = lvls - `i' + 1
+			local t : label `stack' `i' 
 			local shift = 0  // legend shift
 			if "`circtop'" == "" local shift = (`circles' * 2)	
-			local k = `i' + ((`=scalar(obs)' - 1) * `j' ) + `shift'
+			local k = `rev' + ((obs - 1) * `j' ) + `shift'
+
 			local entries `" `entries' `k'  "`t'"  "'
-			local ++j
-		}
-	
+			local --j
+		}	
 		
-		local legend legend(order("`entries'") pos(`legposition') size(`legsize') rows(`rows')) 
+		local legend legend(order("`entries'") pos(`legposition') size(`legsize') rows(`rows') region(fcolor(none))) 
 	
 	}
 	else {
 		local legend legend(off)
 	}
-	
-
 	
 	
 	/////////////////
@@ -509,7 +575,7 @@ preserve
 	if "`lwidth'" =="" local lwidth 0.1
 	if "`lcolor'" =="" local lcolor white
 	if "`palette'" == "" {
-		local palette tableau
+		local palette ptol rainbow
 	}
 	else {
 		tokenize "`palette'", p(",")
@@ -517,8 +583,8 @@ preserve
 		local poptions `3'
 	}
 	
-	local areagraph
 	
+	local areagraph
 	local k = 1
 	
 	forval j = 1/`=scalar(lvls)' {
@@ -527,24 +593,27 @@ preserve
 	
 		forval i = 1/`=scalar(obs)' {
 			
-			if `ovrclr' == 0 {
-				local items = lvls
-				local clr `rev'
+			if `ovrclr'== 1 {
+				
+				summ _color, meanonly
+				local items = `r(max)'
+				
+				summ _color in `i', meanonly
+				local clr = `r(min)'
 			}
 			else {
-				local items = obs
-				local clr `i'
+				local items = lvls
+				local clr `rev'
+				
 			}
 			
-			colorpalette `palette', nograph n(`items') `poptions' 
-				
-			local areagraph`j' `areagraph`j'' (area y`i' x`i' if `stack'==`rev', nodropbase fi(100) fc("`r(p`clr')'%`alpha'") lc(`lcolor') lw(`lwidth')) ||
+			colorpalette `palette', `poptions'  n(`items')  nograph
+
+			local areagraph `areagraph' (area y`i' x`i' if `stack'==`rev', nodropbase fi(100) fc("`r(p`clr')'%`alpha'") lc(`lcolor') lw(`lwidth')) 
 			
-			
-			local k = `k' + 1 // use k for purely random assignments.
+			local ++k  
 		}		
-	
-	local areagraph `areagraph' `areagraph`j''   // collect in one local
+
 	}
 	
 	// circle fill
@@ -571,13 +640,9 @@ preserve
 	local ysize 1
 	local xsize 1
 
-	if "`half'"!="" {
-		
-		local xsize 2
-	}
-	
-	
-	
+	if "`half'"!="" local xsize 2
+
+
 	**** final graph  
 		
     twoway				///
@@ -586,7 +651,8 @@ preserve
 		`rings2'		///	
 		`fill'			///
 			`circlabs'  ///		
-			`labs'		///							
+			`labs'		///
+			`ringline'	///
 				, 		///
 					xsize(`xsize') ysize(`ysize') aspect(`aspect')  /// 
 					xscale(off) yscale(off) ///
