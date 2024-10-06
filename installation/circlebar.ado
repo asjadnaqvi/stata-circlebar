@@ -545,15 +545,19 @@ preserve
 	if "`legposition'" 	== "" local legposition 6
 	
 	if "`nolegend'" == "" & `ovrclr' == 0 {
+		
 		local j = lvls - 1
-	
+		
 		forval i = 1/`=scalar(lvls)' {
 		
 			local rev = lvls - `i' + 1
 			local t : label `stack' `i' 
 			local shift = 0  // legend shift
+			
+			if "`half'" != "" local shift2 = - 1
+			
 			if "`circtop'" == "" local shift = (`circles' * 2)	
-			local k = `rev' + ((obs - 1) * `j' ) + `shift'
+			local k = `rev' + ((obs - 1) * `j' ) + `shift' `shift2'
 
 			local entries `" `entries' `k'  "`t'"  "'
 			local --j
