@@ -35,7 +35,7 @@ version 15
 		[ rows(real 3) LEGSize(string) LEGPOSition(string) half sort 	   										] ///   // v1.4 options
 		[ * aspect(real 1) xsize(real 1) ysize(real 1) 															] ///	// v1.5 options
 		[ SHOWTOTal stat(string) format(string) labnear LABVARiable(varlist max=1 string) COLORVARiable(varlist max=1 numeric) ] /// // v1.6
-		[ rline(numlist max=1) RLINEColor(string) RLINEWidth(string) RLINEPattern(string)   ] 										 // v1.6
+		[ rline(numlist) RLINEColor(string) RLINEWidth(string) RLINEPattern(string)   ] 										 // v1.6
 		
 	// check dependencies
 	capture findfile colorpalette.ado
@@ -449,15 +449,19 @@ preserve
 		if "`rlinewidth'" == "" local rlinewidth 0.15
 		if "`rlinepattern'" == "" local rlinepattern solid
 		
-		local rline = ((`radmax' - `radmin') * `rline' / `rhi') + `radmin'		
-
 		
-			local ringline 				(function  sqrt(`rline'^2 - x^2), lc(`rlinecolor') lw(`rlinewidth') lp(`rlinepattern') range(-`rline' `rline'))
-			
-		if "`half'" == "" {
-			local ringline `ringline' 	(function -sqrt(`rline'^2 - x^2), lc(`rlinecolor') lw(`rlinewidth') lp(`rlinepattern') range(-`rline' `rline'))
-		}		
+		
+		
+		foreach x of numlist `rline' {			
 
+			local y = ((`radmax' - `radmin') * `x' / `rhi') + `radmin'		
+
+			local ringline `ringline'	(function  sqrt(`y'^2 - x^2), lc(`rlinecolor') lw(`rlinewidth') lp(`rlinepattern') range(-`y' `y') n(500))
+				
+			if "`half'" == "" {
+				local ringline `ringline' 	(function -sqrt(`y'^2 - x^2), lc(`rlinecolor') lw(`rlinewidth') lp(`rlinepattern') range(-`y' `y') n(500))
+			}
+		}
 	}		
 	
 	

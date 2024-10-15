@@ -19,7 +19,7 @@ This command is also mirrored as {opt polarbar} to align it with other polar pac
                   {cmdab:labc:olor}({it:str}) {cmdab:ro:tate}({it:num}) {cmdab:lc:olor}({it:str}) {cmdab:lw:idth}({it:str}) {cmdab:circc:olor}({it:str}) {cmdab:circw:idth}({it:str})
                   {cmdab:labg:ap}({it:num}) {cmdab:labs:ize}({it:str}) {cmdab:cf:ill}({it:str}) {cmdab:clc:olor}({it:str})  {cmdab:clw:idth}({it:str}) {cmd:points}({it:num}) {cmdab:showval:ues} 
                   {cmdab:noleg:end} {cmdab:legs:ize}({it:str}) {cmdab:legpos:ition}({it:str}) {cmd:rows}({it:num}) 
-                  {cmdab:rline}({it:num}) {cmdab:rlinec:olor}({it:str}) {cmdab:rlinew:idth}({it:str}) {cmdab:rlinep:attern}({it:str}) * {cmd:]}
+                  {cmdab:rline}({it:numlist}) {cmdab:rlinec:olor}({it:str}) {cmdab:rlinew:idth}({it:str}) {cmdab:rlinep:attern}({it:str}) * {cmd:]}
 
 {p 4 4 2}
 
@@ -103,7 +103,7 @@ This option is useful if a non-white background is used.{p_end}
 {p2coldent : {opt clw:idth(str)}}Line with of the center circle line. Default is {opt clw(0.2)}.{p_end}
 
 
-{p2coldent : {opt rline(num)}}Add a custom reference circle.{p_end}
+{p2coldent : {opt rline(numlist)}}Add reference lines.{p_end}
 
 {p2coldent : {opt rlinec:olor(str)}}Color of the reference circle. Default value is {opt rlinec(black)}.{p_end}
 
@@ -133,7 +133,7 @@ This option is useful if a non-white background is used.{p_end}
 
 {stata ssc install palettes, replace}
 {stata ssc install colrspace, replace}
-
+{stata ssc install graphfunctions, replace}
 
 {title:Examples}
 
