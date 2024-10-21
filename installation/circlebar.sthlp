@@ -31,7 +31,7 @@ This command is also mirrored as {opt polarbar} to align it with other polar pac
 The pie slices can be stacked by the {opt stack(var2)} variable. If there is more data than is required, then the program will collapse the data using the mean value of the {opt var} by {opt var1()} and {opt var2()}.p_end}
 
 {p2coldent : {opt stat(mean|sum)}}If there are multiple observations per {opt by()} and/or {opt stack()} variables, then by default the program take the mean by triggering {opt stat(mean)}.
-Users can also sum the data by using the {opt stat(sum)}. Weights are allowed here. As a note of caution, it is highly recommended to prepare the data before using this command.{{p_end}
+Users can also sum the data by using the {opt stat(sum)}. Even though these options are available, preparing the data beforehand is highly recommended.{{p_end}{{p_end}
 
 {p2coldent : {opt range(num)}}The height of the circles can be controled by defining an upper bound using {opt range()}. This ensures that data can be made comparable across graphs.
 Note that if the {opt range()} value is lower than the maximum height value in the data, the program will throw an error.{p_end}
