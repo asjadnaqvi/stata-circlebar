@@ -1,6 +1,7 @@
-*! circlebar/polarbar v1.6 (05 Oct 2024)
+*! circlebar/polarbar v1.7  (14 Jan 2025)
 *! Asjad Naqvi (asjadnaqvi@gmail.com)
 
+* v1.7  (14 Jan 2025): Allows markers for one variable. Fixed wrong legend entries under certain conditions. rows() changed to legcol() to align with other packages. palette default is now tableau.
 * v1.6  (05 Oct 2024): added showtotal, stat(), format(), labnear, labvar(), colorvar() rline(), rclinec(), rlinep(), circlabpos()	
 * v1.5	(28 Apr 2024): Better passthru options. Many bug fixes. Added half. Added sort.
 * v1.4  (03 Feb 2024): better legend options added. other code cleanup. 
@@ -9,12 +10,12 @@
 * v1.21 (25 Sep 2023): Fixed a bug where circtop was resulting in wrong legend keys.  saving(), graphregion() added.
 * v1.2  (23 Mar 2023): fixed a bug where legend names were reversed. Improved other parts of the code.
 * v1.1  (26 Feb 2023): added: cfill(), labcolor(), rotate(). label angle fixed. Various bug fixes.
-* v1.01 (06 Dec 2022): Minor fixes
-* v1.0  (20 Nov 2022): First release
+* v1.01 (06 Dec 2022): Minor fixes.
+* v1.0  (20 Nov 2022): First release.
 
 **********************************
 
-* A simpler version of the code description is available here: 
+* This package is based on the following guide:
 * https://medium.com/the-stata-guide/stata-graphs-circular-bar-graphs-ii-8ae960ec49d6
 
 cap program drop circlebar
@@ -32,21 +33,28 @@ version 15
 		[ LABGap(real 10) LABSize(string) legend(passthru)														] ///
 		[ LABColor(string) ROtate(real 0) 																		] ///   // v1.1 options
 		[ CFill(string) CLColor(string) CLWidth(string)	points(numlist max=1 >100) 								] ///	// v1.3 options
-		[ rows(real 3) LEGSize(string) LEGPOSition(string) half sort 	   										] ///   // v1.4 options
-		[ * aspect(real 1) xsize(real 1) ysize(real 1) 															] ///	// v1.5 options
+		[ LEGCOLumns(real 3) LEGSize(string) LEGPOSition(string) half sort 	   										] ///   // v1.4 options
+		[ * aspect(string) xsize(real 1) ysize(real 1) 															] ///	// v1.5 options
 		[ SHOWTOTal stat(string) format(string) labnear LABVARiable(varlist max=1 string) COLORVARiable(varlist max=1 numeric) ] /// // v1.6
-		[ rline(numlist) RLINEColor(string) RLINEWidth(string) RLINEPattern(string)   ] 										 // v1.6
+		[ rline(numlist) RLINEColor(string) RLINEWidth(string) RLINEPattern(string)   ] 				///						 // v1.6
+		[ scatter(string) ] 
 		
 	// check dependencies
 	capture findfile colorpalette.ado
 	if _rc != 0 {
-		display as error "The {bf:palettes} package is missing. Install the {stata ssc install palettes, replace:palettes} and {stata ssc install colrspace, replace:colrspace} packages."
+		display as error "The {bf:palettes} package is missing. Click here to install {stata ssc install palettes, replace:palettes} and {stata ssc install colrspace, replace:colrspace} packages."
 		exit
 	}
 	
+	capture findfile shapes.ado
+	if _rc != 0 {
+		display as error "The {bf:graphfunctions} package is missing. Click here to install {stata ssc install graphfunctions, replace:graphfunctions}."
+		exit
+	}		
+	
 	
 	if `radmin' >= `radmax' {
-		di as error  "{bf:radmin()} >= {bf:radmax()}. "	
+		display as error  "{bf:radmin()} >= {bf:radmax()}. "	
 		exit 
 	}
 
@@ -73,13 +81,28 @@ preserve
 	keep if `touse'
 	drop if missing(`varlist')
 	
-	keep `varlist' `by' `stack' `labvariable' `colorvariable' `exp'
+	if "`scatter'" != "" {
+		tokenize "`scatter'", parse(",")
+			local scat1 `1'
+			local scat2 `3'
+			
+		cap confirm numeric var `scat1'
+		if _rc!=0 {  // if string
+			display as error "`scat1' is not numeric."
+			exit
+		}	
+	}
+	
+
+	keep `varlist' `by' `stack' `labvariable' `colorvariable' `exp' `scat1'
 	
 	
 	if "`stack'" != "" {
 		fillin `by' `stack'  // tiangularize
-		recode `varlist' (.=0)
+		recode `varlist' `colorvariable' (.=0)
 	}
+	
+	
 	
 	// local options
 	
@@ -136,6 +159,8 @@ preserve
 	}			
 
 	
+	
+	
 	if "`stat'" 	== "" local stat sum
 	if "`weight'" 	!= "" local myweight  [`weight' = `exp']	
 
@@ -150,8 +175,11 @@ preserve
 		local keepclrvar (first) `colorvariable'
 	}
 	
-	collapse (`stat') `varlist' `keeplabvar' `keepclrvar' `myweight' , by(`by' `stack')
 	
+	
+	collapse (`stat') `varlist' `scat1' `keeplabvar' `keepclrvar' `myweight'  , by(`by' `stack')
+	
+		
 	
 	if "`sort'" != "" {		// optimize this part
 		bysort `by': egen _count = sum(`varlist')
@@ -166,6 +194,8 @@ preserve
 		
 	}		
 
+	
+	
 	
 	// preserve the labels and values
 	levelsof `by', local(idlabels)   
@@ -222,6 +252,27 @@ preserve
 	gen double x =  radius * cos(angle) 
 	gen double y =  radius * sin(angle) 		
 	
+
+	if "`scatter'"!="" {
+
+		replace `scat1' = `scat1' / `rhi'
+	
+		
+		gen double scatterrad = ((`radmax' - `radmin') * (`scat1' - 0) / (1 - 0)) + `radmin'
+	
+		gen double scatterang = (angle + angle[_n-1]) / 2
+		replace scatterang = angle / 2 in 1
+		
+		gen double _markx = scatterrad * cos(scatterang)
+		gen double _marky = scatterrad * sin(scatterang)
+		
+		drop `scat1' scatterrad scatterang	 
+		local scattervar _markx _marky
+		
+	}
+	
+
+	
 	drop theta
 	local items = _N
 	
@@ -236,10 +287,13 @@ preserve
 	gen dummy = `varlist' == 0
 	drop `varlist' stackvar
 
+	
+	
 	gen id = 1
-	reshape wide x y radius angle dummy `labvariable' `colorvariable', i(id `stack' ) j(`by')				
+	reshape wide x y radius angle dummy `labvariable' `scattervar' `colorvariable', i(id `stack' ) j(`by')				
 
-
+	
+	
 	expand 3		
 	sort `stack'
 	bysort `stack' : gen serial = _n
@@ -339,6 +393,7 @@ preserve
 	if "`format'" == "" local format "%8.1f"
 	
 
+		
 	**********************	
 	// add pie labels	//
 	**********************
@@ -449,17 +504,15 @@ preserve
 		if "`rlinewidth'" == "" local rlinewidth 0.15
 		if "`rlinepattern'" == "" local rlinepattern solid
 		
-		
-		
-		
+
 		foreach x of numlist `rline' {			
 
 			local y = ((`radmax' - `radmin') * `x' / `rhi') + `radmin'		
 
-			local ringline `ringline'	(function  sqrt(`y'^2 - x^2), lc(`rlinecolor') lw(`rlinewidth') lp(`rlinepattern') range(-`y' `y') n(500))
+			local ringline `ringline' (function  sqrt(`y'^2 - x^2), lc(`rlinecolor') lw(`rlinewidth') lp(`rlinepattern') range(-`y' `y') n(500))
 				
 			if "`half'" == "" {
-				local ringline `ringline' 	(function -sqrt(`y'^2 - x^2), lc(`rlinecolor') lw(`rlinewidth') lp(`rlinepattern') range(-`y' `y') n(500))
+				local ringline `ringline' (function -sqrt(`y'^2 - x^2), lc(`rlinecolor') lw(`rlinewidth') lp(`rlinepattern') range(-`y' `y') n(500))
 			}
 		}
 	}		
@@ -489,6 +542,24 @@ preserve
 	}
 	
 	
+	////////////////////
+	// marker labels  //
+	////////////////////
+	
+	if "`scatter'"!="" {
+	
+		gen _markx = .
+		gen _marky = .
+	
+		forval i = 1/`=scalar(obs)' {
+			replace _markx = _markx`i'[1] in `i'
+			replace _marky = _marky`i'[1] in `i'
+		}
+		
+		local markscatter (scatter _marky _markx, `scat2')   	
+	
+	}
+	
 	/////////////////
 	//   circles   //
 	/////////////////
@@ -508,19 +579,26 @@ preserve
 			set obs `newobs'
 		}
 		
-
+		
+		local ringcount = 0
+		
 		forval x = `radmin'(`gap')`radmax' {	
 			    local rings `rings' (function  sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`points'))
 			
 			if "`half'" == "" {
 				local rings `rings' (function -sqrt(`x'^2 - x^2), lc(`circcolor') lw(`circwidth') lp(solid) range(-`x' `x') n(`points'))
-			}		
+				local ++ringcount
+			}
+			
+			local ++ringcount
+			
 		}
 		
 
 		if "`circtop'" != "" {
 			local rings2 `rings'
 			local rings
+			local ringcount = 0
 		}
 	
 	}
@@ -536,45 +614,6 @@ preserve
 	}
 	
 
-
-	/////////////////
-	//   legend    //
-	/////////////////
-	
-	
-
-	
-	
-	if "`legsize'" 		== "" local legsize 2.2
-	if "`legposition'" 	== "" local legposition 6
-	
-	if "`nolegend'" == "" & `ovrclr' == 0 {
-		
-		local j = lvls - 1
-		
-		forval i = 1/`=scalar(lvls)' {
-		
-			local rev = lvls - `i' + 1
-			local t : label `stack' `i' 
-			local shift = 0  // legend shift
-			
-			if "`half'" != "" local shift2 = - 1
-			
-			if "`circtop'" == "" local shift = (`circles' * 2)	
-			local k = `rev' + ((obs - 1) * `j' ) + `shift' `shift2'
-
-			local entries `" `entries' `k'  "`t'"  "'
-			local --j
-		}	
-		
-		local legend legend(order("`entries'") pos(`legposition') size(`legsize') rows(`rows') region(fcolor(none))) 
-	
-	}
-	else {
-		local legend legend(off)
-	}
-	
-	
 	/////////////////
 	// main layer  //
 	/////////////////
@@ -583,7 +622,7 @@ preserve
 	if "`lwidth'" =="" local lwidth 0.1
 	if "`lcolor'" =="" local lcolor white
 	if "`palette'" == "" {
-		local palette ptol rainbow
+		local palette tableau
 	}
 	else {
 		tokenize "`palette'", p(",")
@@ -601,30 +640,76 @@ preserve
 	
 		forval i = 1/`=scalar(obs)' {
 			
-			if `ovrclr'== 1 {
-				
-				summ _color, meanonly
-				local items = `r(max)'
-				
-				summ _color in `i', meanonly
-				local clr = `r(min)'
+			if  "`colorvariable'"=="" {
+				if `ovrclr'== 1 {
+					summ _color, meanonly
+					local items = `r(max)'
+					
+					summ _color in `i', meanonly
+					local clr = `r(min)'
+				}
+				else {
+					local items = lvls
+					local clr `rev'
+					
+				}
 			}
 			else {
-				local items = lvls
-				local clr `rev'
-				
+				summ _clrgrp`i', meanonly
+				local items = `r(max)'
+					
+				summ _clrgrp`i' if `stack'==`rev', meanonly
+				local clr = `r(min)'
 			}
 			
-			colorpalette `palette', `poptions'  n(`items')  nograph
+			colorpalette `palette', `poptions' n(`items') nograph
 
 			local areagraph `areagraph' (area y`i' x`i' if `stack'==`rev', nodropbase fi(100) fc("`r(p`clr')'%`alpha'") lc(`lcolor') lw(`lwidth')) 
 			
 			local ++k  
 		}		
-
 	}
 	
-	// circle fill
+	
+	/////////////////
+	//   legend    //
+	/////////////////
+	
+
+	if "`legsize'" 		== "" local legsize 2.2
+	if "`legposition'" 	== "" local legposition 6
+	
+	if "`nolegend'" == "" & `ovrclr' == 0 {
+		
+		local j = lvls - 1
+		
+		forval i = 1/`=scalar(lvls)' {
+		
+			local rev = lvls - `i' + 1
+			local t : label `stack' `i' 
+			
+			local k = `rev' + ((obs - 1) * `j' ) + `ringcount' 
+
+			
+			di "ringcount= `ringcount', k = `k'"
+
+			local entries `" `entries' `k'  "`t'"  "'
+			local --j
+		}	
+		
+
+		
+		local legend legend(order("`entries'") pos(`legposition') size(`legsize') cols(`legcolumns') region(fcolor(none))) 
+	
+	}
+	else {
+		local legend legend(off)
+	}	
+	
+	
+	/////////////////
+	// circle fill //
+	/////////////////
 	
 	if "`cfill'"  	== "" local cfill white
 	if "`clcolor'"  == "" local clcolor white
@@ -638,11 +723,15 @@ preserve
 	
 	local ymin = -`radmax'
 	
-		if "`half'"!="" {
-			local aspect 0.5
-			local xsize 2
-			local ymin = 0
-		}
+	if "`aspect'"=="" {
+		local aspect 1
+		if "`half'"!="" local aspect 0.5
+	}
+	
+	if "`half'"!="" {
+		local xsize 2
+		local ymin = 0
+	}
 		
 	
 	local ysize 1
@@ -661,6 +750,7 @@ preserve
 			`circlabs'  ///		
 			`labs'		///
 			`ringline'	///
+			`markscatter'	///
 				, 		///
 					xsize(`xsize') ysize(`ysize') aspect(`aspect')  /// 
 					xscale(off) yscale(off) ///

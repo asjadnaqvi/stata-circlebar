@@ -11,8 +11,8 @@
 
 
 
-# circlebar/polarbar v1.6
-(05 Oct 2024)
+# circlebar/polarbar v1.7
+(14 Jan 2025)
 
 A package for polar bar graphs in Stata. Note that both `circlebar` and `polarbar` are substituable commands.
 
@@ -27,7 +27,7 @@ SSC (**v1.6**):
 ssc install circlebar, replace
 ```
 
-GitHub (**v1.6**):
+GitHub (**v1.7**):
 
 ```
 net install circlebar, from("https://raw.githubusercontent.com/asjadnaqvi/stata-circlebar/main/installation/") replace
@@ -68,9 +68,8 @@ circlebar var [if] [in] [weight], by(var1) [ stack(var2) ]
                   nocircles circtop range(num) nocirclabels circlabformat(str) circlabsize(str) circlabcolor(str)
                   labcolor(str) rotate(num) lcolor(str) lwidth(str) circcolor(str) circwidth(str)
                   labgap(num) labsize(str) cfill(str) clcolor(str)  clwidth(str) points(num) showvalues 
-                  nolegend legsize(str) legposition(str) rows(num) 
-                  rline(num) rlinecolor(str) rlinewidth(str) rlinepattern(str) * ]
-
+                  nolegend legsize(str) legposition(str) rows(num) scatter(variable [, options])
+                  rline(numlist) rlinecolor(str) rlinewidth(str) rlinepattern(str) * ]
 ```
 
 See the help file `help circlebar` for details.
@@ -300,6 +299,12 @@ Please open an [issue](https://github.com/asjadnaqvi/stata-circlebar/issues) to 
 
 
 ## Change log
+
+**v1.7 (14 Jan 2025)**
+- Users can now pass on markers by using the option `scatter(variable, options)`.
+- Fixes to legend showing wrong entries under certain conditions.
+- `rows()` changed back to `legcolumns()` to make it consistent with other packages.
+- Several bug fixes and changes to defaults.
 
 **v1.6 (05 Oct 2024)**
 - Weights are now allowed.

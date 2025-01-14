@@ -1,7 +1,7 @@
 {smcl}
-{* 05Oct2024}{...}
+{* 14Jan2025}{...}
 {hi:help polarbar/circlebar}{...}
-{right:{browse "https://github.com/asjadnaqvi/stata-circlebar":circlebar/polarbar v1.6 (GitHub)}}
+{right:{browse "https://github.com/asjadnaqvi/stata-circlebar":circlebar/polarbar v1.7 (GitHub)}}
 
 {hline}
 
@@ -18,7 +18,7 @@ This command is also mirrored as {opt polarbar} to align it with other polar pac
                   {cmdab:nocirc:les} {cmdab:circt:op} {cmdab:ra:nge}({it:num}) {cmdab:nocirclab:els} {cmdab:circlabf:ormat}({it:str}) {cmdab:circlabs:ize}({it:str}) {cmdab:circlabc:olor}({it:str})
                   {cmdab:labc:olor}({it:str}) {cmdab:ro:tate}({it:num}) {cmdab:lc:olor}({it:str}) {cmdab:lw:idth}({it:str}) {cmdab:circc:olor}({it:str}) {cmdab:circw:idth}({it:str})
                   {cmdab:labg:ap}({it:num}) {cmdab:labs:ize}({it:str}) {cmdab:cf:ill}({it:str}) {cmdab:clc:olor}({it:str})  {cmdab:clw:idth}({it:str}) {cmd:points}({it:num}) {cmdab:showval:ues} 
-                  {cmdab:noleg:end} {cmdab:legs:ize}({it:str}) {cmdab:legpos:ition}({it:str}) {cmd:rows}({it:num}) 
+                  {cmdab:noleg:end} {cmdab:legs:ize}({it:str}) {cmdab:legpos:ition}({it:str}) {cmd:rows}({it:num}) {cmd:scatter}({it:variable [, options]})
                   {cmdab:rline}({it:numlist}) {cmdab:rlinec:olor}({it:str}) {cmdab:rlinew:idth}({it:str}) {cmdab:rlinep:attern}({it:str}) * {cmd:]}
 
 {p 4 4 2}
@@ -31,7 +31,7 @@ This command is also mirrored as {opt polarbar} to align it with other polar pac
 The pie slices can be stacked by the {opt stack(var2)} variable. If there is more data than is required, then the program will collapse the data using the mean value of the {opt var} by {opt var1()} and {opt var2()}.p_end}
 
 {p2coldent : {opt stat(mean|sum)}}If there are multiple observations per {opt by()} and/or {opt stack()} variables, then by default the program take the mean by triggering {opt stat(mean)}.
-Users can also sum the data by using the {opt stat(sum)}. Even though these options are available, preparing the data beforehand is highly recommended.{{p_end}{{p_end}
+Users can also sum the data by using the {opt stat(sum)}. Weights are allowed here. As a note of caution, it is highly recommended to prepare the data before using this command.{{p_end}
 
 {p2coldent : {opt range(num)}}The height of the circles can be controled by defining an upper bound using {opt range()}. This ensures that data can be made comparable across graphs.
 Note that if the {opt range()} value is lower than the maximum height value in the data, the program will throw an error.{p_end}
@@ -122,6 +122,11 @@ This option is useful if a non-white background is used.{p_end}
 
 {p2coldent : {opt legpos:ition(str)}}Position of legend. Default is {opt legpos(6)} for 6 o' clock.{p_end}
 
+
+{p2coldent : {opt scatter(var [, options])}}Define a numeric variable that can be plotted on the polar bar as scatter points.
+Users can also define standard marker options for customizations.{p_end}
+
+
 {p2coldent : {opt *}}All other standard twoway options not elsewhere specified.{p_end}
 
 
@@ -142,8 +147,8 @@ See {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}.
 
 {title:Package details}
 
-Version      : {bf:polarbar} {bf:circlebar} v1.6
-This release : 05 Oct 2024
+Version      : {bf:polarbar} {bf:circlebar} v1.7
+This release : 14 Jan 2025
 First release: 18 Nov 2022
 Repository   : {browse "https://github.com/asjadnaqvi/stata-circlebar":GitHub}
 Keywords     : Stata, polar bar graphs
@@ -161,17 +166,8 @@ Please submit bugs, errors, feature requests on {browse "https://github.com/asja
 
 {title:Citation guidelines}
 
-Suggested citation for this package:
-
-Naqvi, A. (2024). Stata package "circlebar" version 1.6. Release date 05 October 2024. https://github.com/asjadnaqvi/stata-circlebar.
-
-@software{circlebar,
-   author = {Naqvi, Asjad},
-   title = {Stata package ``circlebar''},
-   url = {https://github.com/asjadnaqvi/stata-circlebar},
-   version = {1.6},
-   date = {2024-10-05}
-}
+See {browse "https://ideas.repec.org/c/boc/bocode/s459141.html"} for the official SSC citation. 
+Please note that the GitHub version might be newer than the SSC version.
 
 
 {title:References}
@@ -182,11 +178,9 @@ Naqvi, A. (2024). Stata package "circlebar" version 1.6. Release date 05 October
 
 
 {title:Other visualization packages}
-
 {psee}
-    {helpb arcplot}, {helpb alluvial}, {helpb bimap}, {helpb bumparea}, {helpb bumpline}, {helpb circlebar}, {helpb circlepack}, {helpb clipgeo}, {helpb delaunay}, {helpb graphfunctions}, {helpb joyplot}, 
+    {helpb arcplot}, {helpb alluvial}, {helpb bimap}, {helpb bumparea}, {helpb bumpline}, {helpb circlebar}, {helpb circlepack}, {helpb clipgeo}, {helpb delaunay}, {helpb graphfunctions}, {helpb geoboundary}, {helpb geoflow}, {helpb joyplot}, 
 	{helpb marimekko}, {helpb polarspike}, {helpb sankey}, {helpb schemepack}, {helpb spider}, {helpb splinefit}, {helpb streamplot}, {helpb sunburst}, {helpb ternary}, {helpb treecluster}, {helpb treemap}, {helpb trimap}, {helpb waffle}
 
-or visit {browse "https://github.com/asjadnaqvi":GitHub}.
-
+Visit {browse "https://github.com/asjadnaqvi":GitHub} for further information.
 

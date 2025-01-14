@@ -1,4 +1,4 @@
-v 1.6
+v 1.7
 d {bf:CIRCLEBAR}: A Stata package for polar bar graphs
 d See {bf:help circlebar} or {bf:help polarbar} after installation.
 d
@@ -9,9 +9,9 @@ d KW: graphs
 d KW: circlar bar graph
 d KW: polar bar graph
 d
-d Distribution-Date: 20241005
+d Distribution-Date: 20250114
 d
-d This  version: 05 Oct 2024
+d This  version: 14 Jan 2025
 d First version: 18 Nov 2022
 d License: MIT
 d

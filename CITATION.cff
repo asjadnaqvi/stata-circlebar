@@ -3,6 +3,6 @@ authors:
 - family-names: "Naqvi"
   given-names: "Asjad"
 title: "Stata package ``circlebar''"
-version: 1.6
-date-released: 2024-10-05
+version: 1.7
+date-released: 2025-01-14
 url: "https://github.com/asjadnaqvi/stata-circlebar"

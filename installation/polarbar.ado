@@ -1,7 +1,7 @@
-*! polarbar v1.6 (05 Oct 2024)
+*! polarbar v1.7 (14 Jan 2025)
 *! Asjad Naqvi (asjadnaqvi@gmail.com)
 
-**** a duplicate of the circlebar program to match with the upcoming suite of polar packages
+**** a duplicate of the circlebar program
 
 cap program drop polarbar
 
